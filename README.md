@@ -9,6 +9,8 @@ There are 2 alternative stacks:
 * Cherokee + PostGIS
     install-eden-cherokee-postgis.sh
     configure-eden-cherokee-postgis.sh
+    * There are installation scripts available for CentOS 6.9 as well. Run [install-eden-cherokee-postgis-centos-6.9-1.sh](https://github.com/sahana/eden_deploy_manual/blob/master/install-eden-cherokee-postgis-centos-6.9-1.sh "install-eden-cherokee-postgis-centos-6.9-1.sh"), [install-eden-cherokee-postgis-centos-6.9-2.sh](https://github.com/sahana/eden_deploy_manual/blob/master/install-eden-cherokee-postgis-centos-6.9-2.sh "install-eden-cherokee-postgis-centos-6.9-2.sh") and [configure-eden-cherokee-postgis-centos-6.9.sh](https://github.com/sahana/eden_deploy_manual/blob/master/configure-eden-cherokee-postgis-centos-6.9.sh "configure-eden-cherokee-postgis-centos-6.9.sh") in order. After installation, be sure to change the FQDN at the nginx configuration at /etc/nginx/nginx.conf and restart nginx by `/etc/init.d/nginx start`
+    
 * Apache + MySQL
     install-eden-apache-mysql.sh
     configure-eden-apache-mysql.sh
