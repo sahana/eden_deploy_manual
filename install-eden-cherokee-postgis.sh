@@ -103,7 +103,11 @@ cd /home
 env GIT_SSL_NO_VERIFY=true git clone --recursive https://github.com/web2py/web2py.git
 cd web2py
 # 2.14.6
-git reset --hard cda35fd
+#git reset --hard cda35fd
+# 2.16.1
+#git reset --hard 7035398
+# 2.17.1
+git reset --hard 285013a
 git submodule update --init --recursive
 ln -s /home/web2py ~
 cp -f /home/web2py/handlers/wsgihandler.py /home/web2py
