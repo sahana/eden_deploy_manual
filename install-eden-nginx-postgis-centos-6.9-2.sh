@@ -17,7 +17,7 @@ yum groupinstall -y 'Development Tools'
 yum install -y geos-devel
 pip2.7 install shapely
 pip2.7 install xlrd
-yum install -y mod_wsgi
+#yum install -y mod_wsgi
 
 #########
 # Web2Py
@@ -28,7 +28,9 @@ cd /home
 env GIT_SSL_NO_VERIFY=true git clone --recursive https://github.com/web2py/web2py.git
 cd web2py
 # 2.16.1
-git reset --hard 7035398
+#git reset --hard 7035398
+# 2.17.1
+git reset --hard 285013a
 git submodule update --init --recursive
 sed -i "s|credential_decoder = lambda cred: urllib.unquote(cred)|credential_decoder = lambda cred: unquote(cred)|" /home/web2py/gluon/packages/dal/pydal/base.py
 ln -s /home/web2py ~

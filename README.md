@@ -3,19 +3,25 @@ Deployment of Eden with Manual Scripts
 
 http://eden.sahanafoundation.org/wiki/InstallationGuidelines/Linux/Server
 
-These scripts can be used to deploy Eden on a single, usually virtual, machine running Debian Linux versions 7, 8 or 9
+These scripts can be used to deploy Eden on a single, usually virtual, machine.
 
-There are 2 alternative stacks:
-* Cherokee + PostGIS
+There are 3 alternative stacks:
+* Cherokee + PostGIS (on Debian Linux versions 7, 8 or 9)
     install-eden-cherokee-postgis.sh
     configure-eden-cherokee-postgis.sh
-    * There are installation scripts available for CentOS 6.9 as well. Run [install-eden-cherokee-postgis-centos-6.9-1.sh](https://github.com/sahana/eden_deploy_manual/blob/master/install-eden-cherokee-postgis-centos-6.9-1.sh "install-eden-cherokee-postgis-centos-6.9-1.sh"), [install-eden-cherokee-postgis-centos-6.9-2.sh](https://github.com/sahana/eden_deploy_manual/blob/master/install-eden-cherokee-postgis-centos-6.9-2.sh "install-eden-cherokee-postgis-centos-6.9-2.sh") and [configure-eden-cherokee-postgis-centos-6.9.sh](https://github.com/sahana/eden_deploy_manual/blob/master/configure-eden-cherokee-postgis-centos-6.9.sh "configure-eden-cherokee-postgis-centos-6.9.sh") in order. After installation, be sure to change the FQDN at the nginx configuration at /etc/nginx/nginx.conf and restart nginx by `/etc/init.d/nginx start`
-    * Sometimes you will get permission denied error if you look at /var/log/nginx/error.log. One of the cause for this can be **SELinux**. To make sure, do
-    	* `sudo cat /var/log/audit/audit.log | grep nginx | grep denied` which should give various error lines. In order to solve this issue, you can do `setsebool -P httpd_can_network_connect 1` since nginx uses the httpd label [[source]](https://stackoverflow.com/questions/23948527/13-permission-denied-while-connecting-to-upstreamnginx)
+ "install-eden-cherokee-postgis-centos-6.9-2.sh") and [configure-eden-cherokee-postgis-centos-6.9.sh](https://github.com/sahana/eden_deploy_manual/blob/master/configure-eden-cherokee-postgis-centos-6.9.sh "configure-eden-cherokee-postgis-centos-6.9.sh") in order.
     
-* Apache + MySQL
+* Apache + MySQL (on Debian Linux versions 7, 8 or 9)
     install-eden-apache-mysql.sh
     configure-eden-apache-mysql.sh
+
+* nginx + PostGIS (on CentOS version 6.9)
+    install-eden-nginx-postgis-centos-6.9-1.sh
+    install-eden-nginx-postgis-centos-6.9-2.sh
+    configure-eden-nginx-postgis-centos-6.9.sh
+    After installation, be sure to change the FQDN at the nginx configuration at /etc/nginx/nginx.conf and restart nginx by `/etc/init.d/nginx start`
+    * Sometimes you will get permission denied error if you look at /var/log/nginx/error.log. One of the cause for this can be **SELinux**. To make sure, do
+    	* `sudo cat /var/log/audit/audit.log | grep nginx | grep denied` which should give various error lines. In order to solve this issue, you can do `setsebool -P httpd_can_network_connect 1` since nginx uses the httpd label [[source]](https://stackoverflow.com/questions/23948527/13-permission-denied-while-connecting-to-upstreamnginx)
 
 Alternative possibilities exist, but these scripts cannot be used as-is for that:
 * Apache + PostGIS on a single, usually virtual, machine
