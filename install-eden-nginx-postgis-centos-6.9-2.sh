@@ -32,7 +32,8 @@ cd web2py
 # 2.17.1
 git reset --hard 285013a
 git submodule update --init --recursive
-sed -i "s|credential_decoder = lambda cred: urllib.unquote(cred)|credential_decoder = lambda cred: unquote(cred)|" /home/web2py/gluon/packages/dal/pydal/base.py
+# Fix for 2.16.1
+#sed -i "s|credential_decoder = lambda cred: urllib.unquote(cred)|credential_decoder = lambda cred: unquote(cred)|" /home/web2py/gluon/packages/dal/pydal/base.py
 ln -s /home/web2py ~
 cp -f /home/web2py/handlers/wsgihandler.py /home/web2py
 

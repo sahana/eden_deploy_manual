@@ -17,7 +17,7 @@ yum install -y redhat-lsb-core unixODBC unixODBC-devel libtool-ltdl-devel libtoo
 yum install -y mlocate
 updatedb
 
-# enable EPEL
+# Enable EPEL to get Python 2.7
 #wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 #rpm -ivh epel-release-6-8.noarch.rpm
 yum install -y epel-release centos-release-scl
@@ -29,5 +29,6 @@ cat << EOF >> "/etc/ld.so.conf"
 EOF
 ldconfig
 
-#enable it as bash
+# Enable software collection in bash:
+# https://access.redhat.com/solutions/527703
 scl enable python27 bash
