@@ -204,7 +204,7 @@ uwsgi=/usr/local/bin/uwsgi
 prog=uwsgi
 lockfile=/var/lock/subsys/uwsgi
 pid=/tmp/uwsgi-prod.pid
-args="/home/web2py/uwsgi.ini --pythonpath /opt/rh/python27/root/usr/lib64/python2.7"
+args="/home/web2py/uwsgi.ini"
 RETVAL=0
 
 start() {
