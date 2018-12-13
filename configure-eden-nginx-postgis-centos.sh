@@ -46,8 +46,9 @@ git pull
 # -----------------------------------------------------------------------------
 # Email
 # -----------------------------------------------------------------------------
-echo configure for Internet mail delivery
-dpkg-reconfigure exim4-config
+# @ToDo: Check for CentOS equivalent
+#echo configure for Internet mail delivery
+#dpkg-reconfigure exim4-config
 
 # -----------------------------------------------------------------------------
 # Sahana Eden

@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Determine CentOS version (script supports 6 & 7)
+CENTOS=$(cat /etc/centos-release | tr -dc '0-9.'|cut -d \. -f1)
+
+# Enable software collection in bash:
+# https://access.redhat.com/solutions/527703
+#scl enable python27 bash
+
 pip2.7 install --upgrade pip
 
 pip2.7 install Image
@@ -152,6 +159,18 @@ uid = web2py
 chdir = /home/web2py/
 module = wsgihandler
 mule = run_scheduler.py
+pythonpath = /home/web2py/site-packages
+pythonpath = /home/web2py
+pythonpath = /opt/rh/python27/root/usr/lib64/python27.zip
+pythonpath = /opt/rh/python27/root/usr/lib64/python2.7
+pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/plat-linux2
+pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/lib-tk
+pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/lib-old
+pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/lib-dynload
+pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/site-packages
+pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/site-packages/psycopg2-2.7.6-py2.7-linux-x86_64.egg
+pythonpath = /opt/rh/python27/root/usr/lib/python2.7/site-packages
+pythonpath = /home/web2py/gluon/packages/dal
 workers = 4
 cheap = true
 idle = 1000
@@ -175,6 +194,8 @@ chown web2py:nginx /var/log/uwsgi
 cat << EOF > "/etc/init.d/uwsgi-prod"
 #!/bin/bash
 #
+# chkconfig: 235 95 05
+#
 
 # Source function library
 . /etc/rc.d/init.d/functions
@@ -183,7 +204,7 @@ uwsgi=/usr/local/bin/uwsgi
 prog=uwsgi
 lockfile=/var/lock/subsys/uwsgi
 pid=/tmp/uwsgi-prod.pid
-args="/home/web2py/uwsgi.ini"
+args="/home/web2py/uwsgi.ini --pythonpath /opt/rh/python27/root/usr/lib64/python2.7"
 RETVAL=0
 
 start() {
@@ -241,12 +262,13 @@ EOF
 
 chmod a+x /etc/init.d/uwsgi-prod
 /etc/init.d/uwsgi-prod start
+chkconfig --levels 235 uwsgi-prod on
+
 
 # Setting for nginx
 cat << EOF > "/etc/nginx/nginx.conf"
 # For more information on configuration, see:
 #   * Official English Documentation: http://nginx.org/en/docs/
-#   * Official Russian Documentation: http://nginx.org/ru/docs/
 
 user nginx;
 worker_processes auto;
@@ -303,7 +325,7 @@ http {
 }
 EOF
 
-/etc/init.d/iptables stop
+service iptables stop
 chkconfig --del iptables
 
 chkconfig --levels 235 nginx on
@@ -314,18 +336,37 @@ chmod 755 /usr/local/bin/uwsgi
 usermod -a -G web2py nginx
 chmod -R u+wx /home/web2py/applications
 
-/etc/init.d/nginx start
+# SELinux: Allow nginx to access uwsgi
+# https://stackoverflow.com/questions/23948527/13-permission-denied-while-connecting-to-upstreamnginx
+setsebool -P httpd_can_network_connect 1
+#setsebool -P httpd_can_network_connect_db 1
+
+service nginx start
 
 ############
 # PostgreSQL
 ############
 cd /tmp
-curl -O https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-6-x86_64/pgdg-centos96-9.6-3.noarch.rpm
+if [ $CENTOS == '7' ]; then
+    curl -O https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
+elif [ $CENTOS == '6' ]; then
+    curl -O https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-6-x86_64/pgdg-centos96-9.6-3.noarch.rpm
+else
+    echo 'Unsupported Linux version: These scripts only support CentOS 6 or 7'
+    exit 1
+fi
 rpm -ivh pgdg-centos96-9.6-3.noarch.rpm
 yum install -y postgresql96-server
 yum install -y postgis2_96
 yum install -y pg_top96
-pip2.7 install psycopg2-binary
+#pip2.7 install psycopg2
+#pip2.7 install psycopg2-binary
+yum install -y postgresql96-devel
+wget http://initd.org/psycopg/tarballs/PSYCOPG-2-7/psycopg2-2.7.6.tar.gz
+tar zxvf psycopg2-2.7.6.tar.gz
+cd psycopg2-2.7.6
+/opt/rh/python27/root/usr/bin/python setup.py build_ext --pg-config /usr/pgsql-9.6/bin/pg_config install
+
 
 # Tune PostgreSQL
 cat << EOF >> "/etc/sysctl.conf"
@@ -340,7 +381,8 @@ EOF
 sysctl -w kernel.shmmax=552992768 # For 1024 MB RAM
 sysctl -w kernel.shmall=2097152
 
-service postgresql-9.6 initdb
+#service postgresql-9.6 initdb
+/usr/pgsql-9.6/bin/postgresql96-setup initdb
 chkconfig postgresql-9.6 on
 service postgresql-9.6 start
 sed -i 's|host    all             all             127.0.0.1/32            ident|host    all             all             127.0.0.1/32            md5|' /var/lib/pgsql/9.6/data/pg_hba.conf

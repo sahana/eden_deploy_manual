@@ -15,13 +15,11 @@ There are 3 alternative stacks:
     install-eden-apache-mysql.sh
     configure-eden-apache-mysql.sh
 
-* nginx + PostGIS (on CentOS version 6.9)
-    install-eden-nginx-postgis-centos-6.9-1.sh
-    install-eden-nginx-postgis-centos-6.9-2.sh
-    configure-eden-nginx-postgis-centos-6.9.sh
+* nginx + PostGIS (on CentOS version 6.9/7)
+    install-eden-nginx-postgis-centos-1.sh
+    install-eden-nginx-postgis-centos-2.sh
+    configure-eden-nginx-postgis-centos.sh
     After installation, be sure to change the FQDN at the nginx configuration at /etc/nginx/nginx.conf and restart nginx by `/etc/init.d/nginx start`
-    * Sometimes you will get permission denied error if you look at /var/log/nginx/error.log. One of the cause for this can be **SELinux**. To make sure, do
-    	* `sudo cat /var/log/audit/audit.log | grep nginx | grep denied` which should give various error lines. In order to solve this issue, you can do `setsebool -P httpd_can_network_connect 1` since nginx uses the httpd label [[source]](https://stackoverflow.com/questions/23948527/13-permission-denied-while-connecting-to-upstreamnginx)
 
 Alternative possibilities exist, but these scripts cannot be used as-is for that:
 * Apache + PostGIS on a single, usually virtual, machine
@@ -29,7 +27,7 @@ Alternative possibilities exist, but these scripts cannot be used as-is for that
 * Cherokee + Eden on one machine + PostGIS on a second machine
 
 
-Additional scripts:
+Additional scripts (Debian-only):
 
 * Add a Test instance to the same box as Production
     add_test_site.sh

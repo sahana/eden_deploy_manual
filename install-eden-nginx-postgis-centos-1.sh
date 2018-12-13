@@ -32,3 +32,4 @@ ldconfig
 # Enable software collection in bash:
 # https://access.redhat.com/solutions/527703
 scl enable python27 bash
+
