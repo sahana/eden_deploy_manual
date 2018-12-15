@@ -9,7 +9,6 @@ There are 3 alternative stacks:
 * Cherokee + PostGIS (on Debian Linux versions 7, 8 or 9)
     install-eden-cherokee-postgis.sh
     configure-eden-cherokee-postgis.sh
- "install-eden-cherokee-postgis-centos-6.9-2.sh") and [configure-eden-cherokee-postgis-centos-6.9.sh](https://github.com/sahana/eden_deploy_manual/blob/master/configure-eden-cherokee-postgis-centos-6.9.sh "configure-eden-cherokee-postgis-centos-6.9.sh") in order.
     
 * Apache + MySQL (on Debian Linux versions 7, 8 or 9)
     install-eden-apache-mysql.sh
