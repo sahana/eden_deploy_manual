@@ -356,20 +356,23 @@ gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck=1
 EOF
 
-yum install MariaDB-server MariaDB-client MariaDB-devel
+yum install -y MariaDB-server MariaDB-client MariaDB-devel
 
-pip2.7 install mysql-python
+# Fails to compile:
+#pip2.7 install mysql-python
+yum install -y MySQL-python
 
 # Tune for smaller RAM setups
-sed -i 's|query_cache_size        = 16M|query_cache_size = 1M|' /etc/mysql/my.cnf
-sed -i 's|key_buffer              = 16M|key_buffer = 1M|' /etc/mysql/my.cnf
-sed -i 's|max_allowed_packet      = 16M|max_allowed_packet = 1M|' /etc/mysql/my.cnf
+#sed -i 's|query_cache_size        = 16M|query_cache_size = 1M|' /etc/my.cnf.d/server.cnf
+#sed -i 's|key_buffer              = 16M|key_buffer = 1M|' /etc/my.cnf.d/server.cnf
+#sed -i 's|max_allowed_packet      = 16M|max_allowed_packet = 1M|' /etc/my.cnf.d/server.cnf
 
 systemctl start mariadb
 systemctl enable mariadb
 
-echo 'Answer Yes to all questions asked by MySQL Secure Installation'
-mysql_secure_installation
+# Done manually in script 2 so that we link to our password
+#echo 'Answer Yes to all questions asked by MySQL Secure Installation'
+#mysql_secure_installation
 
 #####################
 # Management scripts

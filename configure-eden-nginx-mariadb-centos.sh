@@ -18,7 +18,7 @@ fi
 
 # @ToDo: Generate a random password
 echo Note that web2py will not work with passwords with an @ in them
-echo -e "What is the new PostgreSQL password: \c "
+echo -e "What is the new MariaDB password: \c "
 read password
 
 echo "Now reconfiguring system to use the hostname: $hostname"
@@ -64,10 +64,35 @@ sed -i "s|akeytochange|$sitename$password|" ~web2py/applications/eden/models/000
 sed -i "s|#settings.base.public_url = \"http://127.0.0.1:8000\"|settings.base.public_url = \"http://$sitename\"|" ~web2py/applications/eden/models/000_config.py
 sed -i 's|#settings.base.cdn = True|settings.base.cdn = True|' ~web2py/applications/eden/models/000_config.py
 
+#########
 # MariaDB
-mysqladmin create sahana
+#########
 
-# Configure Database
+# Create Database
+mysqladmin -u root create sahana
+
+# Create User
+mysql -e "CREATE USER 'sahana'@'localhost' IDENTIFIED BY '$password';FLUSH PRIVILEGES;"
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'sahana'@'localhost' WITH GRANT OPTION;"
+
+# Remove Test Database
+mysql -e "DROP DATABASE IF EXISTS test;" --user=root
+# Remove Anonymous Users
+mysql -e "DELETE FROM mysql.user WHERE User='';" --user=root
+# Remove Remote Root
+mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');" --user=root
+# Set Root Password
+mysql -e "UPDATE mysql.user SET Password=PASSWORD('$password') WHERE User='root';FLUSH PRIVILEGES;" --user=root
+
+# Allow root user to access database without entering password
+cat << EOF > "/root/.my.cnf"
+[client]
+user=root
+EOF
+
+echo "password='$password'" >> "/root/.my.cnf"
+
+# Configure Eden to use Database
 sed -i 's|#settings.database.db_type = "mysql"|settings.database.db_type = "mysql"|' ~web2py/applications/eden/models/000_config.py
 sed -i "s|#settings.database.password = \"password\"|settings.database.password = \"$password\"|" ~web2py/applications/eden/models/000_config.py
 
