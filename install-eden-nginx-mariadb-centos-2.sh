@@ -345,7 +345,20 @@ service nginx start
 #########
 # MariaDB
 #########
-yum install mariadb-server python-mysqldb
+
+cat << EOF > "/etc/yum.repos.d/MariaDB.repo"
+# MariaDB 10.3 CentOS repository list
+# http://downloads.mariadb.org/mariadb/repositories/
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.3/centos7-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+EOF
+
+yum install MariaDB-server MariaDB-client MariaDB-devel
+
+pip2.7 install mysql-python
 
 # Tune for smaller RAM setups
 sed -i 's|query_cache_size        = 16M|query_cache_size = 1M|' /etc/mysql/my.cnf
