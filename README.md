@@ -5,7 +5,7 @@ http://eden.sahanafoundation.org/wiki/InstallationGuidelines/Linux/Server
 
 These scripts can be used to deploy Eden on a single, usually virtual, machine.
 
-There are 3 alternative stacks:
+There are 4 alternative stacks supported by these scripts:
 * Cherokee + PostGIS (on Debian Linux versions 7, 8 or 9)
     install-eden-cherokee-postgis.sh
     configure-eden-cherokee-postgis.sh
@@ -15,9 +15,15 @@ There are 3 alternative stacks:
     configure-eden-apache-mysql.sh
 
 * nginx + PostGIS (on CentOS version 6.9/7)
-    install-eden-nginx-postgis-centos-1.sh
+    install-eden-centos-1.sh
     install-eden-nginx-postgis-centos-2.sh
     configure-eden-nginx-postgis-centos.sh
+    After installation, be sure to change the FQDN at the nginx configuration at /etc/nginx/nginx.conf and restart nginx by `/etc/init.d/nginx start`
+
+* nginx + PostGIS (on CentOS version 6.9/7)
+    install-eden-centos-1.sh
+    install-eden-nginx-mariadb-centos-2.sh
+    configure-eden-nginx-mariadb-centos.sh
     After installation, be sure to change the FQDN at the nginx configuration at /etc/nginx/nginx.conf and restart nginx by `/etc/init.d/nginx start`
 
 Alternative possibilities exist, but these scripts cannot be used as-is for that:

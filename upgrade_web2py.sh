@@ -1,4 +1,4 @@
-# CLI script to upgrade Web2Py from 2.14.6 to 2.16.1
+# CLI script to upgrade Web2Py from 2.14.6 to 2.17.1
 # - this is designed to be used with a Cherokee/PostGIS installation
 
 # Procedure:
@@ -27,15 +27,16 @@ git pull
 cd ~web2py
 python web2py.py -S eden -M -R fieldnames.py
 
-# Update web2py to 2.16.1
+# Update web2py to 2.17.1
 git pull
-git reset --hard 7035398
+#git reset --hard 7035398 # 2.16.1
+git reset --hard 285013a
 git submodule update
 
-# Patch PyDAL (Scheduler fix)
-sed -i 's/credential_decoder = lambda cred: urllib.unquote(cred)/credential_decoder = lambda cred: unquote(cred)/' gluon/packages/dal/pydal/base.py
+# Patch PyDAL (Scheduler fix) for 2.16.1
+#sed -i 's/credential_decoder = lambda cred: urllib.unquote(cred)/credential_decoder = lambda cred: unquote(cred)/' gluon/packages/dal/pydal/base.py
 
-# Run a Migration with NEW web2py (2.16.1):
+# Run a Migration with NEW web2py (2.17.1):
 cd ~web2py/applications/eden
 sed -i 's/settings.base.migrate = False/settings.base.migrate = True/g' models/000_config.py
 # MySQL

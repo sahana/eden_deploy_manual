@@ -64,23 +64,12 @@ sed -i "s|akeytochange|$sitename$password|" ~web2py/applications/eden/models/000
 sed -i "s|#settings.base.public_url = \"http://127.0.0.1:8000\"|settings.base.public_url = \"http://$sitename\"|" ~web2py/applications/eden/models/000_config.py
 sed -i 's|#settings.base.cdn = True|settings.base.cdn = True|' ~web2py/applications/eden/models/000_config.py
 
-# PostgreSQL
-echo "CREATE USER sahana WITH PASSWORD '$password';" > /tmp/pgpass.sql
-su -c - postgres "psql -q -d template1 -f /tmp/pgpass.sql"
-rm -f /tmp/pgpass.sql
-su -c - postgres "createdb -O sahana -E UTF8 sahana -T template0"
-#su -c - postgres "createlang plpgsql -d sahana"
-
-# PostGIS
-#su -c - postgres "psql -q -d sahana -f /usr/share/postgresql/9.6/extension/postgis--2.3.0.sql"
-su -c - postgres "psql -q -d sahana -c 'CREATE EXTENSION postgis;'"
-su -c - postgres "psql -q -d sahana -c 'GRANT ALL ON geometry_columns TO sahana;'"
-su -c - postgres "psql -q -d sahana -c 'GRANT ALL ON spatial_ref_sys TO sahana;'"
+# MariaDB
+mysqladmin create sahana
 
 # Configure Database
-sed -i 's|#settings.database.db_type = "postgres"|settings.database.db_type = "postgres"|' ~web2py/applications/eden/models/000_config.py
+sed -i 's|#settings.database.db_type = "mysql"|settings.database.db_type = "mysql"|' ~web2py/applications/eden/models/000_config.py
 sed -i "s|#settings.database.password = \"password\"|settings.database.password = \"$password\"|" ~web2py/applications/eden/models/000_config.py
-sed -i 's|#settings.gis.spatialdb = True|settings.gis.spatialdb = True|' ~web2py/applications/eden/models/000_config.py
 
 # On some systems need to set the PYTHONPATH
 #/etc/profile
