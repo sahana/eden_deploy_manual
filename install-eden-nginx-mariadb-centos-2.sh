@@ -356,11 +356,15 @@ gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck=1
 EOF
 
-yum install -y MariaDB-server MariaDB-client MariaDB-devel
+yum install -y MariaDB-server MariaDB-client MariaDB-shared MariaDB-devel openssl-devel
 
 # Fails to compile:
-#pip2.7 install mysql-python
-yum install -y MySQL-python
+# https://lists.launchpad.net/maria-developers/msg10744.html
+# Solution:
+# https://github.com/DefectDojo/django-DefectDojo/issues/407
+sed '/st_mysql_options options;/a unsigned int reconnect;' /usr/include/mysql/mysql.h -i.bkp
+pip2.7 install mysql-python
+#yum install -y MySQL-python
 
 # Tune for smaller RAM setups
 #sed -i 's|query_cache_size        = 16M|query_cache_size = 1M|' /etc/my.cnf.d/server.cnf
