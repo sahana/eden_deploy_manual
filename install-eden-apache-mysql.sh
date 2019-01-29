@@ -1,12 +1,17 @@
 #!/bin/bash
 
 # Script to turn a generic Debian Wheezy or Jessie box into an Eden server
+# - some work has been done to update to Debian Stretch, but this hasn't been tested
 # with Apache & MySQL
 
 # Which OS are we running?
 read -d . DEBIAN < /etc/debian_version
 
-if [ $DEBIAN == '8' ]; then
+if [ $DEBIAN == '9' ]; then
+    DEBIAN_NAME='stretch'
+    # Apache 2.4
+    extension='.conf'
+elif [ $DEBIAN == '8' ]; then
     DEBIAN_NAME='jessie'
     # Apache 2.4
     extension='.conf'
