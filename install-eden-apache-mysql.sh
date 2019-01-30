@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Script to turn a generic Debian Wheezy or Jessie box into an Eden server
-# - some work has been done to update to Debian Stretch, but this hasn't been tested
+# Script to turn a generic Debian Wheezy, Jessie or Stretch box into an Eden server
 # with Apache & MySQL
 
 # Which OS are we running?
