@@ -29,9 +29,8 @@ apt-get upgrade -y
 apt-get install -y unzip psmisc mlocate telnet lrzsz vim rcconf htop sudo
 if [ $DEBIAN == '9' ]; then
     echo 'elinks-lite not available in Debian 9'
-elif [ $DEBIAN == '8' ]; then
-    apt-get install -y elinks-lite
 else
+    # Debian 7 or 8
     apt-get install -y elinks-lite
 fi
 # Install Git
@@ -44,21 +43,16 @@ apt-get -y install exim4-config exim4-daemon-light
 ########
 if [ $DEBIAN == '9' ]; then
     apt-get -y install mysql-server python-mysqldb phpmyadmin mariadb-client
-elif [ $DEBIAN == '8' ]; then
-    apt-get -y install mysql-server python-mysqldb phpmyadmin mytop
 else
+    # Debian 7 or 8
     apt-get -y install mysql-server python-mysqldb phpmyadmin mytop
 fi
 
 # Tune for smaller RAM setups
 if [ $DEBIAN == '9' ]; then
     echo 'MariaDB tuning needs configuring in Debian 9'
-elif [ $DEBIAN == '8' ]; then
-    sed -i 's|query_cache_size        = 16M|query_cache_size = 1M|' /etc/mysql/my.cnf
-    sed -i 's|key_buffer              = 16M|key_buffer = 1M|' /etc/mysql/my.cnf
-    sed -i 's|max_allowed_packet      = 16M|max_allowed_packet = 1M|' /etc/mysql/my.cnf
-    /etc/init.d/mysql restart
 else
+    # Debian 7 or 8
     sed -i 's|query_cache_size        = 16M|query_cache_size = 1M|' /etc/mysql/my.cnf
     sed -i 's|key_buffer              = 16M|key_buffer = 1M|' /etc/mysql/my.cnf
     sed -i 's|max_allowed_packet      = 16M|max_allowed_packet = 1M|' /etc/mysql/my.cnf
@@ -96,7 +90,12 @@ EOF
 # Python
 #########
 # Install Libraries
-apt-get -y install libgeos-c1
+if [ $DEBIAN == '9' ]; then
+    apt-get -y install libgeos-c1v5
+else
+    # Debian 7 or 8
+    apt-get -y install libgeos-c1
+fi
 
 # Install Python
 #apt-get -y install python2.6
