@@ -26,7 +26,14 @@ apt-get update
 apt-get upgrade -y
 
 # Install Admin Tools
-apt-get install -y unzip psmisc mlocate telnet lrzsz vim elinks-lite rcconf htop sudo
+apt-get install -y unzip psmisc mlocate telnet lrzsz vim rcconf htop sudo
+if [ $DEBIAN == '9' ]; then
+    echo 'elinks-lite not available in Debian 9'
+elif [ $DEBIAN == '8' ]; then
+    apt-get install -y elinks-lite
+else
+    apt-get install -y elinks-lite
+fi
 # Install Git
 apt-get install -y git-core
 # Email
@@ -35,14 +42,28 @@ apt-get -y install exim4-config exim4-daemon-light
 ########
 # MySQL
 ########
-apt-get -y install mysql-server python-mysqldb phpmyadmin mytop
+if [ $DEBIAN == '9' ]; then
+    apt-get -y install mysql-server python-mysqldb phpmyadmin mariadb-client
+elif [ $DEBIAN == '8' ]; then
+    apt-get -y install mysql-server python-mysqldb phpmyadmin mytop
+else
+    apt-get -y install mysql-server python-mysqldb phpmyadmin mytop
+fi
 
 # Tune for smaller RAM setups
-sed -i 's|query_cache_size        = 16M|query_cache_size = 1M|' /etc/mysql/my.cnf
-sed -i 's|key_buffer              = 16M|key_buffer = 1M|' /etc/mysql/my.cnf
-sed -i 's|max_allowed_packet      = 16M|max_allowed_packet = 1M|' /etc/mysql/my.cnf
-
-/etc/init.d/mysql restart
+if [ $DEBIAN == '9' ]; then
+    echo 'MariaDB tuning needs configuring in Debian 9'
+elif [ $DEBIAN == '8' ]; then
+    sed -i 's|query_cache_size        = 16M|query_cache_size = 1M|' /etc/mysql/my.cnf
+    sed -i 's|key_buffer              = 16M|key_buffer = 1M|' /etc/mysql/my.cnf
+    sed -i 's|max_allowed_packet      = 16M|max_allowed_packet = 1M|' /etc/mysql/my.cnf
+    /etc/init.d/mysql restart
+else
+    sed -i 's|query_cache_size        = 16M|query_cache_size = 1M|' /etc/mysql/my.cnf
+    sed -i 's|key_buffer              = 16M|key_buffer = 1M|' /etc/mysql/my.cnf
+    sed -i 's|max_allowed_packet      = 16M|max_allowed_packet = 1M|' /etc/mysql/my.cnf
+    /etc/init.d/mysql restart
+fi
 
 #########
 # Apache
