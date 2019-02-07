@@ -12,7 +12,11 @@ cd /home
 git clone --recursive git://github.com/web2py/web2py.git test
 cd test
 # 2.14.6
-git reset --hard cda35fd
+#git reset --hard cda35fd
+# 2.16.1
+#git reset --hard 7035398
+# 2.17.1
+git reset --hard 285013a
 git submodule update --init --recursive
 ln -s /home/test ~
 cat << EOF > "/home/test/routes.py"
