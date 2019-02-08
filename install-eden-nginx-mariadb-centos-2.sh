@@ -459,8 +459,6 @@ rm -rf databases/*
 rm -f errors/*
 rm -rf sessions/*
 rm -rf uploads/*
-pkill -f 'postgres: sahana sahana'
-sudo -H -u postgres dropdb sahana
 sed -i 's/settings.base.migrate = False/settings.base.migrate = True/g' models/000_config.py
 sed -i 's/settings.base.prepopulate = 0/#settings.base.prepopulate = 0/g' models/000_config.py
 rm -rf compiled
