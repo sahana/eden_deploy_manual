@@ -14,6 +14,7 @@ pip2.7 install lxml
 pip2.7 install python-dateutil
 pip2.7 install pyserial
 pip2.7 install matplotlib
+pip2.7 install geopy
 pip2.7 install requests
 pip2.7 install xlwt
 pip2.7 install reportlab

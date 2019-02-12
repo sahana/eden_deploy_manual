@@ -64,6 +64,8 @@ apt-get -y install python-xlwt
 apt-get -y install build-essential
 apt-get clean
 
+pip install geopy
+
 # Upgrade ReportLab for Percentage support
 #apt-get remove -y python-reportlab
 #wget --no-check-certificate http://pypi.python.org/packages/source/r/reportlab/reportlab-3.3.0.tar.gz
