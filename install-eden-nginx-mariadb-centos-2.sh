@@ -38,10 +38,15 @@ cd web2py
 # 2.16.1
 #git reset --hard 7035398
 # 2.17.1
-git reset --hard 285013a
+#git reset --hard 285013a
+# 2.18.3
+git reset --hard 6128d03
 git submodule update --init --recursive
 # Fix for 2.16.1
 #sed -i "s|credential_decoder = lambda cred: urllib.unquote(cred)|credential_decoder = lambda cred: unquote(cred)|" /home/web2py/gluon/packages/dal/pydal/base.py
+# Fix for 2.18.3
+sed -i "s|from urllib import FancyURLopener, urlencode, urlopen|from urllib import FancyURLopener, urlencode|" /home/web2py/gluon/packages/dal/pydal/_compat.py
+sed -i "/urllib_quote_plus/ a \ \ \ \ from urllib2 import urlopen" /home/web2py/gluon/packages/dal/pydal/_compat.py
 ln -s /home/web2py ~
 cp -f /home/web2py/handlers/wsgihandler.py /home/web2py
 
