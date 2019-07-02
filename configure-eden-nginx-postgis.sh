@@ -71,18 +71,19 @@ fi
 certbot --nginx
 
 # Configure Nginx
+sed -i "s|# gzip_vary on;|gzip_vary on;|" /etc/nginx/nginx.conf
+sed -i "s|# gzip_proxied any;|gzip_proxied expired no-cache no-store private auth;|" /etc/nginx/nginx.conf
+sed -i "s|# gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;|gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;|" /etc/nginx/nginx.conf
+sed -i "s|#gzip_vary on;|gzip_vary on;|" /etc/nginx/nginx.conf
+sed -i "/gzip_vary on;/ a gzip_min_length 10240;" /etc/nginx/nginx.conf
+sed -i "s|gzip_min_length|\tgzip_min_length|" /etc/nginx/nginx.conf
+
 rm /etc/nginx/sites-enabled/default
 cat << EOF > "/etc/nginx/sites-enabled/prod.conf"
 server {
     listen      80;
     server_name $sitename;
     return 301 https://\$server_name\$request_uri;
-
-    # Redirect non-https traffic to https
-    # if ($scheme != "https") {
-    #     return 301 https://\$host\$request_uri;
-    # } # managed by Certbot
-
 }
 server {
     listen          443 ssl;
@@ -91,7 +92,28 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/$sitename/privkey.pem; # managed by Certbot
     ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
     ssl_ciphers         HIGH:!aNULL:!MD5;
-    #to enable correct use of response.static_version
+    location /crossdomain.xml {
+        alias /home/web2py/applications/eden/static/crossdomain.xml;
+        expires max;
+    }
+    location /favicon.ico {
+        alias /home/web2py/applications/eden/static/favicon.ico;
+        expires max;
+    }
+    location /robots.txt {
+        alias /home/web2py/applications/eden/static/robots.txt;
+        expires max;
+    }
+    location /eden/static/ {
+        alias /home/web2py/applications/eden/static/;
+        expires max;
+    }
+    location /eden/static/img/ {
+        alias /home/web2py/applications/eden/static/img/;
+        gzip off;
+        expires max;
+    }
+    # to enable correct use of response.static_version?
     location /static/ {
         alias /home/web2py/applications/eden/static/;
         expires max;
@@ -107,7 +129,6 @@ server {
     port_in_redirect off;
     proxy_redirect off;
     }
-
 }
 EOF
 
