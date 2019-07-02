@@ -320,6 +320,7 @@ http {
             include         /etc/nginx/uwsgi_params;
             uwsgi_param     UWSGI_SCHEME \$scheme;
             uwsgi_param     SERVER_SOFTWARE    nginx/\$nginx_version;
+            uwsgi_read_timeout 1000;
             ### remove the comments if you use uploads (max 10 MB)
             client_max_body_size 10m;
             ###

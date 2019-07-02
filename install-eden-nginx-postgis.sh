@@ -1,40 +1,111 @@
 #!/bin/bash
 
-# Determine CentOS version (script supports 6 & 7)
-CENTOS=$(cat /etc/centos-release | tr -dc '0-9.'|cut -d \. -f1)
+# Script to turn a generic Debian Wheezy or Jessie box into an Eden server
+# with Nginx & PostgreSQL
+# - tunes PostgreSQL for 512Mb RAM (e.g. Amazon Micro (free tier))
+# - run pg1024 to tune for 1Gb RAM (e.g. Amazon Small or greater)
 
-# Enable software collection in bash:
-# https://access.redhat.com/solutions/527703
-#scl enable python27 bash
+# Which OS are we running?
+read -d . DEBIAN < /etc/debian_version
 
-pip2.7 install --upgrade pip
+if [ $DEBIAN == '9' ]; then
+    DEBIAN_NAME='stretch'
+elif [ $DEBIAN == '8' ]; then
+    DEBIAN_NAME='jessie'
+else
+    DEBIAN_NAME='wheezy'
+fi
 
-pip2.7 install Image
-pip2.7 install lxml
-pip2.7 install python-dateutil
-pip2.7 install pyserial
-pip2.7 install matplotlib
-pip2.7 install geopy
-pip2.7 install requests
-pip2.7 install xlwt
-pip2.7 install reportlab
-pip2.7 install ipython
+# Update system
+apt-get update
+apt-get -y upgrade
+apt-get clean
 
-yum groupinstall -y 'Development Tools'
+# Install Admin Tools
+apt-get -y install unzip psmisc mlocate telnet lrzsz vim rcconf htop sudo p7zip dos2unix curl
+if [ $DEBIAN == '9' ]; then
+    apt-get -y install elinks net-tools
+else
+    apt-get -y install elinks-lite
+fi
+apt-get clean
+# Git
+apt-get -y install git-core
+apt-get clean
+# Email
+apt-get -y install exim4-config exim4-daemon-light
+apt-get clean
 
-yum install -y geos-devel
-pip2.7 install shapely
-pip2.7 install xlrd
-#yum install -y mod_wsgi
+#########
+# Python
+#########
+# Install Libraries
+if [ $DEBIAN == '9' ]; then
+    apt-get -y install libgeos-c1v5
+else
+    apt-get -y install libgeos-c1
+fi
+
+# Install Python
+#apt-get -y install python2.7
+apt-get -y install python-dev
+# 100 Mb of diskspace due to deps, so only if you want an advanced shell
+#apt-get -y install ipython
+apt-get clean
+apt-get -y install python-lxml python-setuptools python-dateutil
+apt-get clean
+apt-get -y install python-serial
+#apt-get -y install python-imaging python-reportlab
+apt-get -y install python-imaging
+apt-get -y install python-matplotlib
+apt-get -y install python-pip
+apt-get -y install python-requests
+apt-get -y install python-xlwt
+apt-get -y install build-essential
+apt-get clean
+
+pip install geopy
+
+# Upgrade ReportLab for Percentage support
+#apt-get remove -y python-reportlab
+#wget --no-check-certificate http://pypi.python.org/packages/source/r/reportlab/reportlab-3.3.0.tar.gz
+#tar zxvf reportlab-3.3.0.tar.gz
+#cd reportlab-3.3.0
+#python setup.py install
+#cd ..
+pip install reportlab
+
+# Upgrade Shapely for Simplify enhancements
+#apt-get remove -y python-shapely
+apt-get -y install libgeos-dev
+#wget --no-check-certificate https://pypi.python.org/packages/e6/23/03ea2c965fe5ded97c0dd97c2cd659f1afb5c21f388ec68012d6d981cb7c/Shapely-1.5.17.tar.gz
+#tar zxvf Shapely-1.5.17.tar.gz
+#cd Shapely-1.5.17
+#python setup.py install
+#cd ..
+pip install shapely
+
+# Upgrade XLRD for XLS import support
+#apt-get remove -y python-xlrd
+#wget --no-check-certificate http://pypi.python.org/packages/source/x/xlrd/xlrd-0.9.4.tar.gz
+#tar zxvf xlrd-0.9.4.tar.gz
+#cd xlrd-0.9.4
+#python setup.py install
+#cd ..
+pip install xlrd
 
 #########
 # Web2Py
 #########
-adduser --system web2py
-#groupadd web2py
+apt-get -y install libodbc1
+# Install Web2Py
+adduser --system --disabled-password web2py
+addgroup web2py
 cd /home
 env GIT_SSL_NO_VERIFY=true git clone --recursive https://github.com/web2py/web2py.git
 cd web2py
+# 2.14.6
+#git reset --hard cda35fd
 # 2.16.1
 #git reset --hard 7035398
 # 2.17.1
@@ -49,9 +120,8 @@ sed -i "s|from urllib import FancyURLopener, urlencode, urlopen|from urllib impo
 sed -i "/urllib_quote_plus/ a \ \ \ \ from urllib2 import urlopen" /home/web2py/gluon/packages/dal/pydal/_compat.py
 ln -s /home/web2py ~
 cp -f /home/web2py/handlers/wsgihandler.py /home/web2py
-
 cat << EOF > "/home/web2py/routes.py"
-#!/opt/rh/python27/root/usr/bin/python
+#!/usr/bin/python
 default_application = 'eden'
 default_controller = 'default'
 default_function = 'index'
@@ -68,8 +138,7 @@ EOF
 mkdir /home/web2py/.matplotlib
 chown web2py /home/web2py/.matplotlib
 echo "os.environ['MPLCONFIGDIR'] = '/home/web2py/.matplotlib'" >> /home/web2py/wsgihandler.py
-# @ToDo: fix this
-#sed -i 's|TkAgg|Agg|' /etc/matplotlibrc
+sed -i 's|TkAgg|Agg|' /etc/matplotlibrc
 
 ##############
 # Sahana Eden
@@ -77,8 +146,8 @@ echo "os.environ['MPLCONFIGDIR'] = '/home/web2py/.matplotlib'" >> /home/web2py/w
 # Install Sahana Eden
 cd /home/web2py
 cd applications
+# @ToDo: Stable branch
 env GIT_SSL_NO_VERIFY=true git clone https://github.com/sahana/eden.git
-
 # Fix permissions
 chown web2py ~web2py
 chown web2py ~web2py/applications/admin/cache
@@ -113,17 +182,28 @@ ln -s /home/web2py/applications/eden ~
 ##########
 # Nginx
 ##########
-yum install -y nginx
+apt-get install nginx
 
-##########
-# uwsgi
-##########
+mkdir /var/log/cherokee
+chown www-data:www-data /var/log/cherokee
+mkdir -p /var/lib/cherokee/graphs
+chown www-data:www-data -R /var/lib/cherokee
+
+# Install uWSGI
+#apt-get install -y libxml2-dev
 cd /tmp
-curl -L -O http://projects.unbit.it/downloads/uwsgi-1.9.18.2.tar.gz
+wget http://projects.unbit.it/downloads/uwsgi-1.9.18.2.tar.gz
 tar zxvf uwsgi-1.9.18.2.tar.gz
 cd uwsgi-1.9.18.2
-/opt/rh/python27/root/usr/bin/python uwsgiconfig.py --build pyonly.ini
+#cd uwsgi-1.2.6/buildconf
+#wget http://eden.sahanafoundation.org/downloads/uwsgi_build.ini
+#cd ..
+#sed -i "s|, '-Werror'||" uwsgiconfig.py
+#python uwsgiconfig.py --build uwsgi_build
+python uwsgiconfig.py --build pyonly.ini
 cp uwsgi /usr/local/bin
+
+# Configure uwsgi
 
 ## Log rotation
 cat << EOF > "/etc/logrotate.d/uwsgi"
@@ -141,239 +221,109 @@ EOF
 ## Add Scheduler config
 
 cat << EOF > "/home/web2py/run_scheduler.py"
-#!/opt/rh/python27/root/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import os
 import sys
+
 if '__file__' in globals():
     path = os.path.dirname(os.path.abspath(__file__))
     os.chdir(path)
 else:
     path = os.getcwd() # Seems necessary for py2exe
+
 sys.path = [path]+[p for p in sys.path if not p==path]
+
 # import gluon.import_all ##### This should be uncommented for py2exe.py
 import gluon.widget
 from gluon.shell import run
+
 # Start Web2py Scheduler -- Note the app name is hardcoded!
 if __name__ == '__main__':
     run('eden',True,True,None,False,"from gluon import current; current._scheduler.loop()")
 EOF
 
+
 cat << EOF > "/home/web2py/uwsgi.ini"
 [uwsgi]
 uid = web2py
+gid = web2py
 chdir = /home/web2py/
 module = wsgihandler
 mule = run_scheduler.py
-pythonpath = /home/web2py/site-packages
-pythonpath = /home/web2py
-pythonpath = /opt/rh/python27/root/usr/lib64/python27.zip
-pythonpath = /opt/rh/python27/root/usr/lib64/python2.7
-pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/plat-linux2
-pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/lib-tk
-pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/lib-old
-pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/lib-dynload
-pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/site-packages
-pythonpath = /opt/rh/python27/root/usr/lib64/python2.7/site-packages/psycopg2-2.7.6-py2.7-linux-x86_64.egg
-pythonpath = /opt/rh/python27/root/usr/lib/python2.7/site-packages
-pythonpath = /home/web2py/gluon/packages/dal
 workers = 4
 cheap = true
 idle = 1000
 harakiri = 1000
 pidfile = /tmp/uwsgi-prod.pid
 daemonize = /var/log/uwsgi/prod.log
-socket = 127.0.0.1:9001
+socket = 127.0.0.1:59025
 master = true
 chmod-socket = 666
 chown-socket = web2py:nginx
 EOF
 
 touch /tmp/uwsgi-prod.pid
-chown web2py:nginx /tmp/uwsgi-prod.pid
+chown web2py:www-data /tmp/uwsgi-prod.pid
 
 mkdir -p /var/log/uwsgi
-chown web2py:nginx /var/log/uwsgi
+chown web2py:www-data /var/log/uwsgi
 
 # Init script for uwsgi
 
 cat << EOF > "/etc/init.d/uwsgi-prod"
-#!/bin/bash
-#
-# chkconfig: 235 95 05
+#! /bin/bash
+# /etc/init.d/uwsgi-prod
 #
 
-# Source function library
-. /etc/rc.d/init.d/functions
-
-uwsgi=/usr/local/bin/uwsgi
-prog=uwsgi
-lockfile=/var/lock/subsys/uwsgi
+daemon=/usr/local/bin/uwsgi
 pid=/tmp/uwsgi-prod.pid
 args="/home/web2py/uwsgi.ini"
-RETVAL=0
 
-start() {
-    echo -n $"Starting \$prog: "
-    daemon \$uwsgi --pidfile \$pid -- \$args
-    RETVAL=$?
-    echo
-    [ \$RETVAL = 0 ] && touch \$lockfile
-    return \$RETVAL
-}
-
-stop() {
-    echo -n $"Stopping \$prog: "
-    killproc -p \$pid \$prog
-    RETVAL=$?
-    echo
-    [ \$RETVAL = 0 ] && rm -rf \$lockfile \$pid
-}
-
-reload() {
-    echo -n $"Reloading \$prog" 
-    killproc -p \$pid \$prog -HUP
-    RETVAL=$?
-    echo
-}
-
-rh_status() {
-    status -p \$pid \$uwsgi
-}
-
-case \$1 in
-  start)
-	start
-	;;
-  stop)
-    stop
+# Carry out specific functions when asked to by the system
+case "\$1" in
+    start)
+        echo "Starting uwsgi"
+        start-stop-daemon -p \$pid --start --exec \$daemon -- \$args
+        ;;
+    stop)
+        echo "Stopping script uwsgi"
+        start-stop-daemon --signal INT -p \$pid --stop \$daemon -- \$args
+        ;;
+    restart)
+        \$0 stop
+        sleep 1
+        \$0 start
+        ;;
+    reload)
+        echo "Reloading conf"
+        kill -HUP \`cat \$pid\`
+        ;;
+    *)
+        echo "Usage: /etc/init.d/uwsgi {start|stop|restart|reload}"
+        exit 1
     ;;
-  reload)
-    reload
-    ;;
-  restart)
-	stop
-    start
-    ;;
-  status)  
-    rh_status
-    RETVAL=$?
-    ;;
-  *)  
-        echo $"Usage: \$prog {start|stop|restart|reload|status}"
-        RETVAL=2
 esac
 exit 0
 EOF
 
 chmod a+x /etc/init.d/uwsgi-prod
-/etc/init.d/uwsgi-prod start
-chkconfig --levels 235 uwsgi-prod on
-
-
-# Setting for nginx
-cat << EOF > "/etc/nginx/nginx.conf"
-# For more information on configuration, see:
-#   * Official English Documentation: http://nginx.org/en/docs/
-
-user nginx;
-worker_processes auto;
-error_log /var/log/nginx/error.log;
-pid /var/run/nginx.pid;
-
-# Load dynamic modules. See /usr/share/nginx/README.dynamic.
-include /usr/share/nginx/modules/*.conf;
-
-events {
-    worker_connections  1024;
-}
-
-
-http {
-    server_names_hash_bucket_size 128;
-    access_log  /var/log/nginx/access.log;
-
-    sendfile            on;
-    tcp_nopush          on;
-    tcp_nodelay         on;
-    keepalive_timeout   65;
-    types_hash_max_size 2048;
-
-    include             /etc/nginx/mime.types;
-    default_type        application/octet-stream;
-
-    # Load modular configuration files from the /etc/nginx/conf.d directory.
-    # See http://nginx.org/en/docs/ngx_core_module.html#include
-    # for more information.
-    include /etc/nginx/conf.d/*.conf;
-
-    server {
-        listen          80;
-        server_name     <your-FQDN>;
-        #to enable correct use of response.static_version
-        location /static/ {
-            alias /home/web2py/applications/eden/static/;
-            expires max;
-        }
-        location / {
-            uwsgi_pass      127.0.0.1:9001;
-            #uwsgi_pass      unix:///var/www/web2py/logs/web2py.socket;
-            include         /etc/nginx/uwsgi_params;
-            uwsgi_param     UWSGI_SCHEME \$scheme;
-            uwsgi_param     SERVER_SOFTWARE    nginx/\$nginx_version;
-            uwsgi_read_timeout 1000;
-            ### remove the comments if you use uploads (max 10 MB)
-            client_max_body_size 10m;
-            ###
-	    port_in_redirect off;
-	    proxy_redirect off;
-        }
-    }
-}
-EOF
-
-service iptables stop
-chkconfig --del iptables
-
-chkconfig --levels 235 nginx on
-
-# manage permissions
-chmod 755 /usr/local/bin/uwsgi
-#chmod 710 /home/web2py/
-usermod -a -G web2py nginx
-chmod -R u+wx /home/web2py/applications
-
-# SELinux: Allow nginx to access uwsgi
-# https://stackoverflow.com/questions/23948527/13-permission-denied-while-connecting-to-upstreamnginx
-setsebool -P httpd_can_network_connect 1
-#setsebool -P httpd_can_network_connect_db 1
-
-service nginx start
+update-rc.d uwsgi-prod defaults
 
 ############
 # PostgreSQL
 ############
-cd /tmp
-if [ $CENTOS == '7' ]; then
-    curl -O https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
-elif [ $CENTOS == '6' ]; then
-    curl -O https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-6-x86_64/pgdg-centos96-9.6-3.noarch.rpm
-else
-    echo 'Unsupported Linux version: These scripts only support CentOS 6 or 7'
-    exit 1
-fi
-rpm -ivh pgdg-centos96-9.6-3.noarch.rpm
-yum install -y postgresql96-server
-yum install -y postgis2_96
-yum install -y pg_top96
-#pip2.7 install psycopg2
-#pip2.7 install psycopg2-binary
-yum install -y postgresql96-devel
-wget http://initd.org/psycopg/tarballs/PSYCOPG-2-7/psycopg2-2.7.6.tar.gz
-tar zxvf psycopg2-2.7.6.tar.gz
-cd psycopg2-2.7.6
-/opt/rh/python27/root/usr/bin/python setup.py build_ext --pg-config /usr/pgsql-9.6/bin/pg_config install
+cat << EOF > "/etc/apt/sources.list.d/pgdg.list"
+deb http://apt.postgresql.org/pub/repos/apt/ $DEBIAN_NAME-pgdg main
+EOF
 
+wget --no-check-certificate https://www.postgresql.org/media/keys/ACCC4CF8.asc
+apt-key add ACCC4CF8.asc
+apt-get update
+
+apt-get -y install postgresql-9.6 python-psycopg2 ptop pgtop
+apt-get -y install postgresql-9.6-postgis-2.3
 
 # Tune PostgreSQL
 cat << EOF >> "/etc/sysctl.conf"
@@ -388,20 +338,12 @@ EOF
 sysctl -w kernel.shmmax=552992768 # For 1024 MB RAM
 sysctl -w kernel.shmall=2097152
 
-#service postgresql-9.6 initdb
-/usr/pgsql-9.6/bin/postgresql96-setup initdb
-chkconfig postgresql-9.6 on
-service postgresql-9.6 start
-sed -i 's|host    all             all             127.0.0.1/32            ident|host    all             all             127.0.0.1/32            md5|' /var/lib/pgsql/9.6/data/pg_hba.conf
-sed -i 's|host    all             all             ::1/128                 ident|host    all             all             ::1/128                 md5|' /var/lib/pgsql/9.6/data/pg_hba.conf
-service postgresql-9.6 restart
-
-sed -i 's|#track_counts = on|track_counts = on|' /var/lib/pgsql/9.6/data/postgresql.conf
-sed -i 's|#autovacuum = on|autovacuum = on|' /var/lib/pgsql/9.6/data/postgresql.conf
-sed -i 's|max_connections = 100|max_connections = 20|' /var/lib/pgsql/9.6/data/postgresql.conf
+sed -i 's|#track_counts = on|track_counts = on|' /etc/postgresql/9.6/main/postgresql.conf
+sed -i 's|#autovacuum = on|autovacuum = on|' /etc/postgresql/9.6/main/postgresql.conf
+sed -i 's|max_connections = 100|max_connections = 20|' /etc/postgresql/9.6/main/postgresql.conf
 # 1024Mb RAM: (e.g. t2.micro)
-sed -i 's|#effective_cache_size = 4GB|effective_cache_size = 512MB|' /var/lib/pgsql/9.6/data/postgresql.conf
-sed -i 's|#work_mem = 4MB|work_mem = 8MB|' /var/lib/pgsql/9.6/data/postgresql.conf
+sed -i 's|#effective_cache_size = 4GB|effective_cache_size = 512MB|' /etc/postgresql/9.6/main/postgresql.conf
+sed -i 's|#work_mem = 4MB|work_mem = 8MB|' /etc/postgresql/9.6/main/postgresql.conf
 # If only 512 RAM, activate post-install via pg512 script
 
 #####################
@@ -427,13 +369,14 @@ cat << EOF > "/usr/local/bin/compile"
 #!/bin/bash
 /etc/init.d/uwsgi-prod stop
 cd ~web2py
-sudo -H -u web2py /opt/rh/python27/root/usr/bin/python web2py.py -S eden -M -R applications/eden/static/scripts/tools/compile.py
+python web2py.py -S eden -M -R applications/eden/static/scripts/tools/compile.py
 /etc/init.d/uwsgi-prod start
 EOF
 chmod +x /usr/local/bin/compile
 
 cat << EOF > "/usr/local/bin/pull"
 #!/bin/sh
+
 /etc/init.d/uwsgi-prod stop
 cd ~web2py/applications/eden
 sed -i 's/settings.base.migrate = False/settings.base.migrate = True/g' models/000_config.py
@@ -441,11 +384,11 @@ git reset --hard HEAD
 git pull
 rm -rf compiled
 cd ~web2py
-sudo -H -u web2py /opt/rh/python27/root/usr/bin/python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
+sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
 cd ~web2py/applications/eden
 sed -i 's/settings.base.migrate = True/settings.base.migrate = False/g' models/000_config.py
 cd ~web2py
-sudo -H -u web2py /opt/rh/python27/root/usr/bin/python web2py.py -S eden -M -R applications/eden/static/scripts/tools/compile.py
+python web2py.py -S eden -M -R applications/eden/static/scripts/tools/compile.py
 /etc/init.d/uwsgi-prod start
 EOF
 chmod +x /usr/local/bin/pull
@@ -457,11 +400,11 @@ cd ~web2py/applications/eden
 sed -i 's/settings.base.migrate = False/settings.base.migrate = True/g' models/000_config.py
 rm -rf compiled
 cd ~web2py
-sudo -H -u web2py /opt/rh/python27/root/usr/bin/python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
+sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
 cd ~web2py/applications/eden
 sed -i 's/settings.base.migrate = True/settings.base.migrate = False/g' models/000_config.py
 cd ~web2py
-sudo -H -u web2py /opt/rh/python27/root/usr/bin/python web2py.py -S eden -M -R applications/eden/static/scripts/tools/compile.py
+python web2py.py -S eden -M -R applications/eden/static/scripts/tools/compile.py
 /etc/init.d/uwsgi-prod start
 EOF
 chmod +x /usr/local/bin/migrate
@@ -475,7 +418,7 @@ chmod +x /usr/local/bin/revert
 cat << EOF > "/usr/local/bin/w2p"
 #!/bin/sh
 cd ~web2py
-/opt/rh/python27/root/usr/bin/python web2py.py -S eden -M
+python web2py.py -S eden -M
 EOF
 chmod +x /usr/local/bin/w2p
 
@@ -499,15 +442,15 @@ su -c - postgres "psql -q -d sahana -c 'CREATE EXTENSION postgis;'"
 su -c - postgres "psql -q -d sahana -c 'grant all on geometry_columns to sahana;'"
 su -c - postgres "psql -q -d sahana -c 'grant all on spatial_ref_sys to sahana;'"
 cd ~web2py
-sudo -H -u web2py /opt/rh/python27/root/usr/bin/python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
+sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
 cd ~web2py/applications/eden
 sed -i 's/settings.base.migrate = True/settings.base.migrate = False/g' models/000_config.py
 sed -i 's/#settings.base.prepopulate = 0/settings.base.prepopulate = 0/g' models/000_config.py
 cd ~web2py
-sudo -H -u web2py /opt/rh/python27/root/usr/bin/python web2py.py -S eden -M -R applications/eden/static/scripts/tools/compile.py
+python web2py.py -S eden -M -R applications/eden/static/scripts/tools/compile.py
 /etc/init.d/uwsgi-prod start
 if [ -e /home/data/import.py ]; then
-    sudo -H -u web2py /opt/rh/python27/root/usr/bin/python web2py.py -S eden -M -R /home/data/import.py
+    sudo -H -u web2py python web2py.py -S eden -M -R /home/data/import.py
 fi
 EOF2
 chmod +x /usr/local/bin/clean
@@ -517,10 +460,10 @@ cat << EOF > "/usr/local/bin/pg1024"
 sed -i 's|kernel.shmmax = 279134208|#kernel.shmmax = 279134208|' /etc/sysctl.conf
 sed -i 's|#kernel.shmmax = 552992768|kernel.shmmax = 552992768|' /etc/sysctl.conf
 sysctl -w kernel.shmmax=552992768
-sed -i 's|shared_buffers = 128MB|shared_buffers = 256MB|' /var/lib/pgsql/9.6/data/postgresql.conf
-sed -i 's|effective_cache_size = 256MB|effective_cache_size = 512MB|' /var/lib/pgsql/9.6/data/postgresql.conf
-sed -i 's|work_mem = 4MB|work_mem = 8MB|' /var/lib/pgsql/9.6/data/postgresql.conf
-service postgresql-9.6 restart
+sed -i 's|shared_buffers = 128MB|shared_buffers = 256MB|' /etc/postgresql/9.6/main/postgresql.conf
+sed -i 's|effective_cache_size = 256MB|effective_cache_size = 512MB|' /etc/postgresql/9.6/main/postgresql.conf
+sed -i 's|work_mem = 4MB|work_mem = 8MB|' /etc/postgresql/9.6/main/postgresql.conf
+/etc/init.d/postgresql restart
 EOF
 chmod +x /usr/local/bin/pg1024
 
@@ -529,9 +472,13 @@ cat << EOF > "/usr/local/bin/pg512"
 sed -i 's|#kernel.shmmax = 279134208|kernel.shmmax = 279134208|' /etc/sysctl.conf
 sed -i 's|kernel.shmmax = 552992768|#kernel.shmmax = 552992768|' /etc/sysctl.conf
 sysctl -w kernel.shmmax=279134208
-sed -i 's|shared_buffers = 256MB|shared_buffers = 128MB|' /var/lib/pgsql/9.6/data/postgresql.conf
-sed -i 's|effective_cache_size = 512MB|effective_cache_size = 256MB|' /var/lib/pgsql/9.6/data/postgresql.conf
-sed -i 's|work_mem = 8MB|work_mem = 4MB|' /var/lib/pgsql/9.6/data/postgresql.conf
-service postgresql-9.6 restart
+sed -i 's|shared_buffers = 256MB|shared_buffers = 128MB|' /etc/postgresql/9.6/main/postgresql.conf
+sed -i 's|effective_cache_size = 512MB|effective_cache_size = 256MB|' /etc/postgresql/9.6/main/postgresql.conf
+sed -i 's|work_mem = 8MB|work_mem = 4MB|' /etc/postgresql/9.6/main/postgresql.conf
+/etc/init.d/postgresql restart
 EOF
 chmod +x /usr/local/bin/pg512
+
+apt-get clean
+
+# END
