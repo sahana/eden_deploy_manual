@@ -375,13 +375,14 @@ apt-key add ACCC4CF8.asc
 apt-get update
 
 case $DEBIAN in
-    10 | 9)
-        apt-get -y install "postgresql-10" "pgtop"
-        apt-get -y install "postgresql-10-postgis-2.4"
-        PGHOME=/etc/postgresql/10
+    10)
+        apt-get -y install "postgresql-11" "pgtop"
+        apt-get -y install "postgresql-11-postgis-2.5"
+        PGHOME=/etc/postgresql/11
         ;;
     *)
-        apt-get -y install "postgresql-9.6" "python-psycopg2" "ptop" "pgtop"
+        # Psycopg2 versions in stretch/jessie can have problems with PG10+
+        apt-get -y install "postgresql-9.6" "ptop" "pgtop"
         apt-get -y install "postgresql-9.6-postgis-2.3"
         PGHOME=/etc/postgresql/9.6
         ;;
