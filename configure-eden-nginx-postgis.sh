@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to configure an Eden server
-# - assumes that install-eden-nginx-postgis-py3.sh has been run
+# - assumes that install-eden-nginx-postgis.sh has been run
 
 # =============================================================================
 # Check Debian version
