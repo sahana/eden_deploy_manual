@@ -168,7 +168,7 @@ git submodule update --init --recursive
 # sed -i "/urllib_quote_plus/ a \ \ \ \ from urllib2 import urlopen" $WEB2PY_HOME/gluon/packages/dal/pydal/_compat.py
 
 # Fix for 2.18.5
-sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" $WEB2PY_HOME/gluon/packages/dal/pydal/validators.py
+sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" /home/web2py/gluon/packages/dal/pydal/validators.py
 
 ln -s /home/web2py ~
 cp -f /home/web2py/handlers/wsgihandler.py /home/web2py
