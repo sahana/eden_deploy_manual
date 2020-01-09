@@ -478,7 +478,7 @@ INSTANCE=\$1
 /etc/init.d/uwsgi-\$INSTANCE stop
 cd /home/\$INSTANCE
 sed -i 's/settings.base.migrate = False/settings.base.migrate = True/g' applications/eden/models/000_config.py
-rm -rf compiled
+rm -rf applications/eden/compiled
 sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
 sed -i 's/settings.base.migrate = True/settings.base.migrate = False/g' applications/eden/models/000_config.py
 python web2py.py -S eden -M -R applications/eden/static/scripts/tools/compile.py
