@@ -31,6 +31,7 @@ git submodule update --init --recursive
 
 # Fix for 2.18.5
 sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" /home/demo/gluon/packages/dal/pydal/validators.py
+sed -i "s|'password'|'passwd'|" /home/demo/gluon/packages/dal/pydal/adapters/mysql.py
 
 ln -s /home/demo ~
 cat << EOF > "/home/demo/routes.py"
@@ -54,7 +55,7 @@ EOF
 # Install Sahana Eden
 cd /home/demo/applications
 # @ToDo: Stable branch
-git clone git://github.com/flavour/eden.git
+git clone git://github.com/sahana/eden.git
 # Fix permissions
 chown web2py /home/demo
 chown web2py /home/demo/applications/admin/cache

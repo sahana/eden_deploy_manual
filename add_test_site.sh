@@ -30,6 +30,7 @@ git submodule update --init --recursive
 
 # Fix for 2.18.5
 sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" /home/test/gluon/packages/dal/pydal/validators.py
+sed -i "s|'password'|'passwd'|" /home/test/gluon/packages/dal/pydal/adapters/mysql.py
 
 ln -s /home/test ~
 cat << EOF > "/home/test/routes.py"
@@ -53,7 +54,7 @@ EOF
 # Install Sahana Eden
 cd /home/test/applications
 # @ToDo: Stable branch
-git clone git://github.com/flavour/eden.git
+git clone git://github.com/sahana/eden.git
 # Fix permissions
 chown web2py /home/test
 chown web2py /home/test/applications/admin/cache
@@ -458,6 +459,28 @@ cd /home/\$INSTANCE
 python web2py.py -S eden -M
 EOF
 chmod +x /usr/local/bin/w2p
+
+cat << EOF > "/usr/local/bin/migrate"
+#!/bin/bash
+set -e
+if [[ -z "\$1" ]]; then
+    echo >&2 "Instance needs to be specified: prod or test"
+    exit 1
+elif [[ ! -d "/home/\$1" ]]; then
+    echo >&2 "\$1 is not a valid instance!"
+    exit 1
+fi
+INSTANCE=\$1
+/etc/init.d/uwsgi-\$INSTANCE stop
+cd /home/\$INSTANCE
+sed -i 's/settings.base.migrate = False/settings.base.migrate = True/g' applications/eden/models/000_config.py
+rm -rf compiled
+sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
+sed -i 's/settings.base.migrate = True/settings.base.migrate = False/g' applications/eden/models/000_config.py
+python web2py.py -S eden -M -R applications/eden/static/scripts/tools/compile.py
+/etc/init.d/uwsgi-\$INSTANCE start
+EOF
+chmod +x /usr/local/bin/migrate
 
 # 1st time setup
 clean test

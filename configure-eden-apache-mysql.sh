@@ -178,7 +178,7 @@ mysqladmin create sahana
 
 # Create user for Sahana application
 echo "CREATE USER 'sahana'@'localhost' IDENTIFIED BY '$password';" > "/tmp/mypass"
-echo "GRANT ALL PRIVILEGES ON *.* TO 'sahana'@'localhost' WITH GRANT OPTION;" >> "/tmp/mypass"
+echo "GRANT ALL PRIVILEGES ON sahana.* TO 'sahana'@'localhost' WITH GRANT OPTION;" >> "/tmp/mypass"
 mysql < /tmp/mypass
 rm -f /tmp/mypass
 
