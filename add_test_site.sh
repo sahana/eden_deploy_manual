@@ -33,6 +33,7 @@ sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(f
 sed -i "s|'password'|'passwd'|" /home/test/gluon/packages/dal/pydal/adapters/mysql.py
 
 ln -s /home/test ~
+cp -f /home/test/handlers/wsgihandler.py /home/test
 cat << EOF > "/home/test/routes.py"
 #!/usr/bin/python
 default_application = 'eden'
@@ -63,12 +64,15 @@ chown web2py /home/test/applications/admin/databases
 chown web2py /home/test/applications/admin/errors
 chown web2py /home/test/applications/admin/sessions
 chown web2py /home/test/applications/eden
+mkdir -p /home/test/applications/eden/cache
 chown web2py /home/test/applications/eden/cache
 chown web2py /home/test/applications/eden/cron
 mkdir -p /home/test/applications/eden/databases
 chown web2py /home/test/applications/eden/databases
+mkdir -p /home/test/applications/eden/errors
 chown web2py /home/test/applications/eden/errors
 chown web2py /home/test/applications/eden/models
+mkdir -p /home/test/applications/eden/sessions
 chown web2py /home/test/applications/eden/sessions
 chown web2py /home/test/applications/eden/static/img/markers
 mkdir -p /home/test/applications/eden/static/cache/chart
