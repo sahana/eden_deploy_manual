@@ -31,7 +31,7 @@ git submodule update --init --recursive
 
 # Fix for 2.18.5
 sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" /home/demo/gluon/packages/dal/pydal/validators.py
-sed -i "s|'password'|'passwd'|" /home/demo/gluon/packages/dal/pydal/adapters/mysql.py
+sed -i "s|['password']|['passwd']|" /home/demo/gluon/packages/dal/pydal/adapters/mysql.py
 
 ln -s /home/demo ~
 cp -f /home/demo/handlers/wsgihandler.py /home/demo
