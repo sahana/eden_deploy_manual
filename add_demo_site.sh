@@ -17,9 +17,24 @@ cd demo
 # 2.16.1
 #git reset --hard 7035398
 # 2.17.1
-git reset --hard 285013a
+#git reset --hard 285013a
+# 2.18.3
+# git reset --hard 6128d03
+# 2.18.5
+git reset --hard 59700b8
 git submodule update --init --recursive
+
+## Patch web2py/PyDAL/YATL
+# Fix for 2.18.3
+# sed -i "s|from urllib import FancyURLopener, urlencode, urlopen|from urllib import FancyURLopener, urlencode|" $WEB2PY_HOME/gluon/packages/dal/pydal/_compat.py
+# sed -i "/urllib_quote_plus/ a \ \ \ \ from urllib2 import urlopen" $WEB2PY_HOME/gluon/packages/dal/pydal/_compat.py
+
+# Fix for 2.18.5
+sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" /home/demo/gluon/packages/dal/pydal/validators.py
+sed -i "s|['password']|['passwd']|" /home/demo/gluon/packages/dal/pydal/adapters/mysql.py
+
 ln -s /home/demo ~
+cp -f /home/demo/handlers/wsgihandler.py /home/demo
 cat << EOF > "/home/demo/routes.py"
 #!/usr/bin/python
 default_application = 'eden'
@@ -41,7 +56,7 @@ EOF
 # Install Sahana Eden
 cd /home/demo/applications
 # @ToDo: Stable branch
-git clone git://github.com/flavour/eden.git
+git clone git://github.com/sahana/eden.git
 # Fix permissions
 chown web2py /home/demo
 chown web2py /home/demo/applications/admin/cache
@@ -50,12 +65,15 @@ chown web2py /home/demo/applications/admin/databases
 chown web2py /home/demo/applications/admin/errors
 chown web2py /home/demo/applications/admin/sessions
 chown web2py /home/demo/applications/eden
+mkdir -p /home/demo/applications/eden/cache
 chown web2py /home/demo/applications/eden/cache
 chown web2py /home/demo/applications/eden/cron
 mkdir -p /home/demo/applications/eden/databases
 chown web2py /home/demo/applications/eden/databases
+mkdir -p /home/demo/applications/eden/errors
 chown web2py /home/demo/applications/eden/errors
 chown web2py /home/demo/applications/eden/models
+mkdir -p /home/demo/applications/eden/sessions
 chown web2py /home/demo/applications/eden/sessions
 chown web2py /home/demo/applications/eden/static/img/markers
 mkdir -p /home/demo/applications/eden/static/cache/chart
