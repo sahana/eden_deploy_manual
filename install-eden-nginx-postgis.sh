@@ -96,26 +96,32 @@ apt-get clean
 if [ $PYVERSION == '2' ]; then
     apt-get -y install "python-dev" "python-pip" "python-setuptools"
     PIP=pip
-    apt-get -y install "python-lxml" "python-dateutil"
+    #apt-get -y install "python-lxml" "python-dateutil"
     apt-get -y install "python-serial"
-    apt-get -y install "python-imaging"
-    apt-get -y install "python-matplotlib"
-    apt-get -y install "python-requests"
-    apt-get -y install "python-xlwt"
+    #apt-get -y install "python-imaging"
+    #apt-get -y install "python-matplotlib"
+    #apt-get -y install "python-requests"
+    #apt-get -y install "python-xlwt"
 else
     apt-get -y install "python3-dev" "python3-pip" "python3-setuptools"
     PIP=pip3
-    apt-get -y install "python3-lxml" "python3-dateutil"
+    #apt-get -y install "python3-lxml" "python3-dateutil"
     apt-get -y install "python3-serial"
-    apt-get -y install "python3-pil"
-    apt-get -y install "python3-matplotlib"
-    apt-get -y install "python3-requests"
-    apt-get -y install "python3-xlwt"
+    #apt-get -y install "python3-pil"
+    #apt-get -y install "python3-matplotlib"
+    #apt-get -y install "python3-requests"
+    #apt-get -y install "python3-xlwt"
 fi
 apt-get clean
 
 apt-get -y install "build-essential"
 apt-get clean
+
+$PIP install lxml
+$PIP install python-dateutil
+$PIP install pillow
+$PIP install requests
+$PIP install xlwt
 
 $PIP install geopy
 $PIP install reportlab

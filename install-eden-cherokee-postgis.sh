@@ -8,7 +8,9 @@
 # Which OS are we running?
 read -d . DEBIAN < /etc/debian_version
 
-if [ $DEBIAN == '9' ]; then
+if [ $DEBIAN == '10' ]; then
+    DEBIAN_NAME='buster'
+elif [ $DEBIAN == '9' ]; then
     DEBIAN_NAME='stretch'
 elif [ $DEBIAN == '8' ]; then
     DEBIAN_NAME='jessie'
@@ -23,7 +25,9 @@ apt-get clean
 
 # Install Admin Tools
 apt-get -y install unzip psmisc mlocate telnet lrzsz vim rcconf htop sudo p7zip dos2unix curl
-if [ $DEBIAN == '9' ]; then
+if [ $DEBIAN == '10' ]; then
+    apt-get -y install elinks net-tools
+elif [ $DEBIAN == '9' ]; then
     apt-get -y install elinks net-tools
 else
     apt-get -y install elinks-lite
@@ -40,7 +44,9 @@ apt-get clean
 # Python
 #########
 # Install Libraries
-if [ $DEBIAN == '9' ]; then
+if [ $DEBIAN == '10' ]; then
+    apt-get -y install libgeos-c1v5
+elif [ $DEBIAN == '9' ]; then
     apt-get -y install libgeos-c1v5
 else
     apt-get -y install libgeos-c1
@@ -111,13 +117,22 @@ cd web2py
 # 2.17.1
 #git reset --hard 285013a
 # 2.18.3
-git reset --hard 6128d03
+# git reset --hard 6128d03
+# 2.18.5
+git reset --hard 59700b8
 git submodule update --init --recursive
+
+## Patch web2py/PyDAL/YATL
 # Fix for 2.16.1
 #sed -i "s|credential_decoder = lambda cred: urllib.unquote(cred)|credential_decoder = lambda cred: unquote(cred)|" /home/web2py/gluon/packages/dal/pydal/base.py
 # Fix for 2.18.3
-sed -i "s|from urllib import FancyURLopener, urlencode, urlopen|from urllib import FancyURLopener, urlencode|" /home/web2py/gluon/packages/dal/pydal/_compat.py
-sed -i "/urllib_quote_plus/ a \ \ \ \ from urllib2 import urlopen" /home/web2py/gluon/packages/dal/pydal/_compat.py
+#sed -i "s|from urllib import FancyURLopener, urlencode, urlopen|from urllib import FancyURLopener, urlencode|" /home/web2py/gluon/packages/dal/pydal/_compat.py
+#sed -i "/urllib_quote_plus/ a \ \ \ \ from urllib2 import urlopen" /home/web2py/gluon/packages/dal/pydal/_compat.py
+
+# Fix for 2.18.5
+sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" /home/web2py/gluon/packages/dal/pydal/validators.py
+sed -i "s|['password']|['passwd']|" /home/web2py/gluon/packages/dal/pydal/adapters/mysql.py
+
 ln -s /home/web2py ~
 cp -f /home/web2py/handlers/wsgihandler.py /home/web2py
 cat << EOF > "/home/web2py/routes.py"
@@ -195,7 +210,9 @@ cd /tmp
 wget https://github.com/cherokee/webserver/archive/master.zip
 unzip master.zip
 cd webserver-master
-if [ $DEBIAN == '9' ]; then
+if [ $DEBIAN == '10' ]; then
+    apt-get install -y libtool-bin
+elif [ $DEBIAN == '9' ]; then
     apt-get install -y libtool-bin
 elif [ $DEBIAN == '8' ]; then
     apt-get install -y libtool-bin
