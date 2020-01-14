@@ -542,9 +542,9 @@ cat << EOF > "/usr/local/bin/pg1024"
 sed -i 's|kernel.shmmax = 279134208|#kernel.shmmax = 279134208|' /etc/sysctl.conf
 sed -i 's|#kernel.shmmax = 552992768|kernel.shmmax = 552992768|' /etc/sysctl.conf
 sysctl -w kernel.shmmax=552992768
-sed -i 's|shared_buffers = 128MB|shared_buffers = 256MB|' /etc/postgresql/9.6/main/postgresql.conf
-sed -i 's|effective_cache_size = 256MB|effective_cache_size = 512MB|' /etc/postgresql/9.6/main/postgresql.conf
-sed -i 's|work_mem = 4MB|work_mem = 8MB|' /etc/postgresql/9.6/main/postgresql.conf
+sed -i 's|shared_buffers = 128MB|shared_buffers = 256MB|' $PGHOME/main/postgresql.conf
+sed -i 's|effective_cache_size = 256MB|effective_cache_size = 512MB|' $PGHOME/main/postgresql.conf
+sed -i 's|work_mem = 4MB|work_mem = 8MB|' $PGHOME/main/postgresql.conf
 /etc/init.d/postgresql restart
 EOF
 chmod +x /usr/local/bin/pg1024
@@ -554,9 +554,9 @@ cat << EOF > "/usr/local/bin/pg512"
 sed -i 's|#kernel.shmmax = 279134208|kernel.shmmax = 279134208|' /etc/sysctl.conf
 sed -i 's|kernel.shmmax = 552992768|#kernel.shmmax = 552992768|' /etc/sysctl.conf
 sysctl -w kernel.shmmax=279134208
-sed -i 's|shared_buffers = 256MB|shared_buffers = 128MB|' /etc/postgresql/9.6/main/postgresql.conf
-sed -i 's|effective_cache_size = 512MB|effective_cache_size = 256MB|' /etc/postgresql/9.6/main/postgresql.conf
-sed -i 's|work_mem = 8MB|work_mem = 4MB|' /etc/postgresql/9.6/main/postgresql.conf
+sed -i 's|shared_buffers = 256MB|shared_buffers = 128MB|' $PGHOME/main/postgresql.conf
+sed -i 's|effective_cache_size = 512MB|effective_cache_size = 256MB|' $PGHOME/main/postgresql.conf
+sed -i 's|work_mem = 8MB|work_mem = 4MB|' $PGHOME/main/postgresql.conf
 /etc/init.d/postgresql restart
 EOF
 chmod +x /usr/local/bin/pg512

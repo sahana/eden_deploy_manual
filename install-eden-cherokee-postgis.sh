@@ -334,15 +334,15 @@ CHEROKEE_CONF="/etc/cherokee/cherokee.conf"
 # Install uWSGI
 #apt-get install -y libxml2-dev
 cd /tmp
-wget http://projects.unbit.it/downloads/uwsgi-1.9.18.2.tar.gz
-tar zxvf uwsgi-1.9.18.2.tar.gz
-cd uwsgi-1.9.18.2
+wget https://projects.unbit.it/downloads/uwsgi-2.0.18.tar.gz
+tar zxvf uwsgi-2.0.18.tar.gz
+cd uwsgi-2.0.18
 #cd uwsgi-1.2.6/buildconf
 #wget http://eden.sahanafoundation.org/downloads/uwsgi_build.ini
 #cd ..
 #sed -i "s|, '-Werror'||" uwsgiconfig.py
 #python uwsgiconfig.py --build uwsgi_build
-python uwsgiconfig.py --build pyonly.ini
+python uwsgiconfig.py --build pyonly
 cp uwsgi /usr/local/bin
 
 # Configure uwsgi
