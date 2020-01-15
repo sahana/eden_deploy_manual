@@ -6,7 +6,12 @@
 # Which OS are we running?
 read -d . DEBIAN < /etc/debian_version
 
-if [ $DEBIAN == '9' ]; then
+if [ $DEBIAN == '10' ]; then
+    DEBIAN_NAME='buster'
+    # Apache 2.4
+    extension='.conf'
+    GRANT='Require all granted'
+elif [ $DEBIAN == '9' ]; then
     DEBIAN_NAME='stretch'
     # Apache 2.4
     extension='.conf'

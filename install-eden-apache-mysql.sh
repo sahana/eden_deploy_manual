@@ -1,12 +1,16 @@
 #!/bin/bash
 
-# Script to turn a generic Debian Wheezy, Jessie or Stretch box into an Eden server
+# Script to turn a generic Debian Wheezy, Jessie, Stretch or Buster box into an Eden server
 # with Apache & MySQL
 
 # Which OS are we running?
 read -d . DEBIAN < /etc/debian_version
 
-if [ $DEBIAN == '9' ]; then
+if [ $DEBIAN == '10' ]; then
+    DEBIAN_NAME='buster'
+    # Apache 2.4
+    extension='.conf'
+elif [ $DEBIAN == '9' ]; then
     DEBIAN_NAME='stretch'
     # Apache 2.4
     extension='.conf'
@@ -26,7 +30,9 @@ apt-get upgrade -y
 
 # Install Admin Tools
 apt-get install -y unzip psmisc mlocate telnet lrzsz vim rcconf htop sudo
-if [ $DEBIAN == '9' ]; then
+if [ $DEBIAN == '10' ]; then
+    echo 'elinks-lite not available in Debian 10'
+elif [ $DEBIAN == '9' ]; then
     echo 'elinks-lite not available in Debian 9'
 else
     # Debian 7 or 8
@@ -40,7 +46,9 @@ apt-get -y install exim4-config exim4-daemon-light
 ########
 # MySQL
 ########
-if [ $DEBIAN == '9' ]; then
+if [ $DEBIAN == '10' ]; then
+    apt-get -y install mysql-server python-mysqldb phpmyadmin mariadb-client
+elif [ $DEBIAN == '9' ]; then
     apt-get -y install mysql-server python-mysqldb phpmyadmin mariadb-client
 else
     # Debian 7 or 8
@@ -48,7 +56,9 @@ else
 fi
 
 # Tune for smaller RAM setups
-if [ $DEBIAN == '9' ]; then
+if [ $DEBIAN == '10' ]; then
+    echo 'MariaDB tuning needs configuring in Debian 10'
+elif [ $DEBIAN == '9' ]; then
     echo 'MariaDB tuning needs configuring in Debian 9'
 else
     # Debian 7 or 8
@@ -89,7 +99,9 @@ EOF
 # Python
 #########
 # Install Libraries
-if [ $DEBIAN == '9' ]; then
+if [ $DEBIAN == '10' ]; then
+    apt-get -y install libgeos-c1v5
+elif [ $DEBIAN == '9' ]; then
     apt-get -y install libgeos-c1v5
 else
     # Debian 7 or 8
@@ -101,14 +113,20 @@ fi
 apt-get -y install python-dev
 # 100 Mb of diskspace due to deps, so only if you want an advanced shell
 #apt-get -y install ipython
-apt-get -y install python-lxml python-setuptools python-dateutil
+#apt-get -y install python-lxml python-setuptools python-dateutil
 apt-get -y install python-serial
 #apt-get -y install python-imaging python-reportlab
-apt-get -y install python-imaging
-apt-get -y install python-matplotlib
+#apt-get -y install python-imaging
+#apt-get -y install python-matplotlib
 apt-get -y install python-pip
-apt-get -y install python-requests
-apt-get -y install python-xlwt
+#apt-get -y install python-requests
+#apt-get -y install python-xlwt
+
+pip install lxml
+pip install python-dateutil
+pip install pillow
+pip install requests
+pip install xlwt
 
 pip install geopy
 
