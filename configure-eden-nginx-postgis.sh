@@ -122,7 +122,6 @@ NGINX_CONF=/etc/nginx/nginx.conf
 sed -i "s|# gzip_vary on;|gzip_vary on;|" $NGINX_CONF
 sed -i "s|# gzip_proxied any;|gzip_proxied expired no-cache no-store private auth;|" $NGINX_CONF
 sed -i "s|# gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;|gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;|" $NGINX_CONF
-sed -i "s|#gzip_vary on;|gzip_vary on;|" $NGINX_CONF
 sed -i "/gzip_vary on;/ a gzip_min_length 10240;" $NGINX_CONF
 sed -i "s|gzip_min_length|\tgzip_min_length|" $NGINX_CONF
 
