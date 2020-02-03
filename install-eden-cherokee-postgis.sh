@@ -129,7 +129,11 @@ git submodule update --init --recursive
 #sed -i "s|from urllib import FancyURLopener, urlencode, urlopen|from urllib import FancyURLopener, urlencode|" /home/web2py/gluon/packages/dal/pydal/_compat.py
 #sed -i "/urllib_quote_plus/ a \ \ \ \ from urllib2 import urlopen" /home/web2py/gluon/packages/dal/pydal/_compat.py
 
-# Fix for 2.18.5
+# Fixes for 2.18.5
+cd gluon
+wget http://eden.sahanafoundation.org/downloads/scheduler.diff
+patch -p0 < scheduler.diff
+cd ..
 sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" /home/web2py/gluon/packages/dal/pydal/validators.py
 sed -i "s|\['password'\]|['passwd']|" /home/web2py/gluon/packages/dal/pydal/adapters/mysql.py
 

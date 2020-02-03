@@ -166,7 +166,7 @@ apt-get -y install libodbc1
 adduser --system --disabled-password web2py
 addgroup web2py
 cd /home
-git clone --recursive git://github.com/web2py/web2py.git
+env GIT_SSL_NO_VERIFY=true git clone --recursive git://github.com/web2py/web2py.git
 cd web2py
 # 2.14.6
 #git reset --hard cda35fd
@@ -185,7 +185,11 @@ git submodule update --init --recursive
 # sed -i "s|from urllib import FancyURLopener, urlencode, urlopen|from urllib import FancyURLopener, urlencode|" $WEB2PY_HOME/gluon/packages/dal/pydal/_compat.py
 # sed -i "/urllib_quote_plus/ a \ \ \ \ from urllib2 import urlopen" $WEB2PY_HOME/gluon/packages/dal/pydal/_compat.py
 
-# Fix for 2.18.5
+# Fixes for 2.18.5
+cd gluon
+wget http://eden.sahanafoundation.org/downloads/scheduler.diff
+patch -p0 < scheduler.diff
+cd ..
 sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" /home/web2py/gluon/packages/dal/pydal/validators.py
 sed -i "s|\['password'\]|['passwd']|" /home/web2py/gluon/packages/dal/pydal/adapters/mysql.py
 
