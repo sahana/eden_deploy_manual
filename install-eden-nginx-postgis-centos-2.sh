@@ -223,6 +223,8 @@ RETVAL=0
 
 start() {
     echo -n $"Starting \$prog: "
+    touch \$pid
+    chmod 600 \$pid
     daemon \$uwsgi --pidfile \$pid -- \$args
     RETVAL=$?
     echo

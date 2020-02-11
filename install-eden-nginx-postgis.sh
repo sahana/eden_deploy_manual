@@ -345,6 +345,8 @@ args="$WEB2PY_HOME/uwsgi.ini"
 case "\$1" in
     start)
         echo "Starting uwsgi"
+        touch \$pid
+        chmod 600 \$pid
         start-stop-daemon -p \$pid --start --exec \$daemon --user web2py -- \$args
         ;;
     stop)
