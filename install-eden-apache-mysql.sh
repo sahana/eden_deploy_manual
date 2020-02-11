@@ -303,6 +303,7 @@ cat << EOF > "/usr/local/bin/pull"
 cd ~web2py/applications/eden
 sed -i 's/settings.base.migrate = False/settings.base.migrate = True/g' models/000_config.py
 git pull
+git submodule update --recursive
 /usr/local/bin/maintenance
 rm -rf compiled
 cd ~web2py

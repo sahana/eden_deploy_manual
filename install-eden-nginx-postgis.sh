@@ -466,6 +466,7 @@ cd $EDEN_HOME
 sed -i 's/settings.base.migrate = False/settings.base.migrate = True/g' models/000_config.py
 git reset --hard HEAD
 git pull
+git submodule update --recursive
 rm -rf compiled
 cd $WEB2PY_HOME
 sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
