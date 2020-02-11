@@ -191,16 +191,13 @@ workers = 4
 cheap = true
 idle = 1000
 harakiri = 1000
-pidfile = /tmp/uwsgi-prod.pid
+pidfile = /var/run/uwsgi-prod.pid
 daemonize = /var/log/uwsgi/prod.log
 socket = 127.0.0.1:9001
 master = true
 chmod-socket = 666
 chown-socket = web2py:nginx
 EOF
-
-touch /tmp/uwsgi-prod.pid
-chown web2py:nginx /tmp/uwsgi-prod.pid
 
 mkdir -p /var/log/uwsgi
 chown web2py:nginx /var/log/uwsgi
@@ -219,7 +216,7 @@ cat << EOF > "/etc/init.d/uwsgi-prod"
 uwsgi=/usr/local/bin/uwsgi
 prog=uwsgi
 lockfile=/var/lock/subsys/uwsgi
-pid=/tmp/uwsgi-prod.pid
+pid=/var/run/uwsgi-prod.pid
 args="/home/web2py/uwsgi.ini"
 RETVAL=0
 
