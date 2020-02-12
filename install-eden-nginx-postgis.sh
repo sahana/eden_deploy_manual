@@ -318,7 +318,7 @@ workers = 4
 cheap = true
 idle = 1000
 harakiri = 1000
-pidfile = /tmp/uwsgi-prod.pid
+pidfile = /var/run/uwsgi-prod.pid
 daemonize = /var/log/uwsgi/prod.log
 socket = 127.0.0.1:59025
 master = true
@@ -326,10 +326,7 @@ chmod-socket = 666
 chown-socket = web2py:nginx
 EOF
 
-## PID file and log file directory
-touch /tmp/uwsgi-prod.pid
-chown web2py:www-data /tmp/uwsgi-prod.pid
-
+# Log file directory
 mkdir -p /var/log/uwsgi
 chown web2py:www-data /var/log/uwsgi
 
@@ -341,13 +338,15 @@ cat << EOF > "/etc/init.d/uwsgi-prod"
 #
 
 daemon=/usr/local/bin/uwsgi
-pid=/tmp/uwsgi-prod.pid
+pid=/var/run/uwsgi-prod.pid
 args="$WEB2PY_HOME/uwsgi.ini"
 
 # Carry out specific functions when asked to by the system
 case "\$1" in
     start)
         echo "Starting uwsgi"
+        touch \$pid
+        chmod 600 \$pid
         start-stop-daemon -p \$pid --start --exec \$daemon --user web2py -- \$args
         ;;
     stop)
@@ -469,6 +468,7 @@ cd $EDEN_HOME
 sed -i 's/settings.base.migrate = False/settings.base.migrate = True/g' models/000_config.py
 git reset --hard HEAD
 git pull
+git submodule update --recursive
 rm -rf compiled
 cd $WEB2PY_HOME
 sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
