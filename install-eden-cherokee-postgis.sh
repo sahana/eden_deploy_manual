@@ -24,7 +24,7 @@ apt-get -y upgrade
 apt-get clean
 
 # Install Admin Tools
-apt-get -y install unzip psmisc mlocate telnet lrzsz vim rcconf htop sudo p7zip dos2unix curl
+apt-get -y install "at" "curl" "dos2unix" "htop" "lrzsz" "mlocate" "p7zip" "psmisc" "pwgen" "rcconf" "sudo" "telnet" "unzip" "vim"
 if [ $DEBIAN == '10' ]; then
     apt-get -y install elinks net-tools
 elif [ $DEBIAN == '9' ]; then
@@ -166,7 +166,7 @@ sed -i 's|TkAgg|Agg|' /etc/matplotlibrc
 cd /home/web2py
 cd applications
 # @ToDo: Stable branch
-env GIT_SSL_NO_VERIFY=true git clone https://github.com/sahana/eden.git
+env GIT_SSL_NO_VERIFY=true git clone https://github.com/sahana/eden-stable.git
 # Fix permissions
 chown web2py ~web2py
 chown web2py ~web2py/applications/admin/cache

@@ -29,7 +29,7 @@ apt-get update
 apt-get upgrade -y
 
 # Install Admin Tools
-apt-get install -y unzip psmisc mlocate telnet lrzsz vim rcconf htop sudo
+apt-get install -y "at" "curl" "dos2unix" "htop" "lrzsz" "mlocate" "p7zip" "psmisc" "pwgen" "rcconf" "sudo" "telnet" "unzip" "vim"
 if [ $DEBIAN == '10' ]; then
     echo 'elinks-lite not available in Debian 10'
 elif [ $DEBIAN == '9' ]; then
@@ -222,7 +222,7 @@ sed -i 's|TkAgg|Agg|' /etc/matplotlibrc
 cd web2py
 cd applications
 # @ToDo: Stable branch
-git clone git://github.com/sahana/eden.git
+git clone git://github.com/sahana/eden-stable.git
 # Fix permissions
 chown web2py ~web2py
 chown web2py ~web2py/applications/admin/cache

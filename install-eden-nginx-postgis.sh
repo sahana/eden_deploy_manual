@@ -53,7 +53,7 @@ apt-get clean
 # =============================================================================
 # Install Admin Tools
 #
-apt-get -y install "curl" "dos2unix" "htop" "lrzsz" "mlocate" "p7zip" "psmisc" "pwgen" "rcconf" "sudo" "telnet" "unzip" "vim"
+apt-get -y install "at" "curl" "dos2unix" "htop" "lrzsz" "mlocate" "p7zip" "psmisc" "pwgen" "rcconf" "sudo" "telnet" "unzip" "vim"
 case $DEBIAN in
     10 | 9)
         apt-get -y install "elinks" "net-tools"
