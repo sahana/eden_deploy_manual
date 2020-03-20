@@ -166,7 +166,7 @@ sed -i 's|TkAgg|Agg|' /etc/matplotlibrc
 cd /home/web2py
 cd applications
 # @ToDo: Stable branch
-env GIT_SSL_NO_VERIFY=true git clone https://github.com/sahana/eden-stable.git
+env GIT_SSL_NO_VERIFY=true git clone https://github.com/sahana/eden-stable.git eden
 # Fix permissions
 chown web2py ~web2py
 chown web2py ~web2py/applications/admin/cache

@@ -222,7 +222,7 @@ sed -i 's|TkAgg|Agg|' /etc/matplotlibrc
 cd web2py
 cd applications
 # @ToDo: Stable branch
-git clone git://github.com/sahana/eden-stable.git
+git clone git://github.com/sahana/eden-stable.git eden
 # Fix permissions
 chown web2py ~web2py
 chown web2py ~web2py/applications/admin/cache
