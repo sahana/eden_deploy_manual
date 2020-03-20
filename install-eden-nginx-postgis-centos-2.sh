@@ -88,7 +88,7 @@ echo "os.environ['MPLCONFIGDIR'] = '/home/web2py/.matplotlib'" >> /home/web2py/w
 # Install Sahana Eden
 cd /home/web2py
 cd applications
-git clone https://github.com/sahana/eden.git
+git clone https://github.com/sahana/eden-stable.git eden
 
 # Fix permissions
 chown web2py ~web2py
