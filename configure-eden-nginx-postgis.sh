@@ -126,7 +126,7 @@ sed -i "/gzip_vary on;/ a gzip_min_length 10240;" $NGINX_CONF
 sed -i "s|gzip_min_length|\tgzip_min_length|" $NGINX_CONF
 
 rm -f /etc/nginx/sites-enabled/default
-cat << EOF > "/etc/nginx/sites-enabled/prod.conf"
+cat << EOF > "/etc/nginx/sites-available/prod.conf"
 server {
     listen      80;
     server_name $SITENAME;
@@ -139,6 +139,11 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/$SITENAME/privkey.pem; # managed by Certbot
     ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
     ssl_ciphers         HIGH:!aNULL:!MD5;
+    location /maintenance.html {
+        internal;
+        alias /var/www/maintenance.html;
+        expires 15s;
+    }
     location /crossdomain.xml {
         alias $EDEN_HOME/static/crossdomain.xml;
         expires max;
@@ -166,6 +171,7 @@ server {
         expires max;
     }
     location / {
+        error_page 502 = /maintenance.html;
         uwsgi_pass      127.0.0.1:59025;
         include         /etc/nginx/uwsgi_params;
         uwsgi_param     UWSGI_SCHEME \$scheme;
@@ -173,12 +179,13 @@ server {
         ### remove the comments if you use uploads (max 10 MB)
         client_max_body_size 10m;
         ###
-    port_in_redirect off;
-    proxy_redirect off;
+        port_in_redirect off;
+        proxy_redirect off;
     }
 }
 EOF
 
+ln -s /etc/nginx/sites-available/prod.conf /etc/nginx/sites-enabled/prod.conf
 service nginx restart
 
 # =============================================================================
