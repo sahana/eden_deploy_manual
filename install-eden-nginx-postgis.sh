@@ -280,6 +280,13 @@ apt-get -y install nginx
 apt-get clean
 
 # =============================================================================
+# Install fallback page
+#
+cat << EOF > "/var/www/maintenance.html"
+<html><body><h1>Site Maintenance</h1>Please try again later...</body></html>
+EOF
+
+# =============================================================================
 # Install uWSGI
 #
 cd /tmp
