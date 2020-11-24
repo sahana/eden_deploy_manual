@@ -141,26 +141,9 @@ addgroup web2py
 cd /home
 env GIT_SSL_NO_VERIFY=true git clone --recursive https://github.com/web2py/web2py.git
 cd web2py
-
-## Reset to stable
-# 2.18.3
-# git reset --hard 6128d03
-# 2.18.5
-git reset --hard 59700b8
+# 2.20.4
+git reset --hard 777c305
 git submodule update --init --recursive
-
-## Patch web2py/PyDAL/YATL
-# Fix for 2.18.3
-# sed -i "s|from urllib import FancyURLopener, urlencode, urlopen|from urllib import FancyURLopener, urlencode|" $WEB2PY_HOME/gluon/packages/dal/pydal/_compat.py
-# sed -i "/urllib_quote_plus/ a \ \ \ \ from urllib2 import urlopen" $WEB2PY_HOME/gluon/packages/dal/pydal/_compat.py
-
-# Fixes for 2.18.5
-cd gluon
-wget http://eden.sahanafoundation.org/downloads/scheduler.diff
-patch -p0 < scheduler.diff
-cd ..
-sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" $WEB2PY_HOME/gluon/packages/dal/pydal/validators.py
-sed -i "s|\['password'\]|['passwd']|" /home/web2py/gluon/packages/dal/pydal/adapters/mysql.py
 
 ## Create symbolic link in /root
 ln -s $WEB2PY_HOME ~

@@ -6,15 +6,15 @@ http://eden.sahanafoundation.org/wiki/InstallationGuidelines/Linux/Server
 These scripts can be used to deploy Eden on a single, usually virtual, machine.
 
 There are 5 alternative stacks supported by these scripts:
-* Cherokee + PostGIS (on Debian Linux versions 7, 8 or 9)
-    install-eden-cherokee-postgis.sh
-    configure-eden-cherokee-postgis.sh
-    
-* nginx + PostGIS (on Debian Linux versions 7, 8 or 9)
+* nginx + PostGIS (on Debian Linux versions 8, 9 or 10) - recommended
     install-eden-nginx-postgis.sh
     configure-eden-nginx-postgis.sh
-    
-* Apache + MySQL (on Debian Linux versions 7, 8 or 9)
+
+* Cherokee + PostGIS (on Debian Linux versions 7, 8, 9 or 10)
+    install-eden-cherokee-postgis.sh
+    configure-eden-cherokee-postgis.sh
+
+* Apache + MySQL (on Debian Linux versions 7, 8, 9 or 10)
     install-eden-apache-mysql.sh
     configure-eden-apache-mysql.sh
 
@@ -35,7 +35,6 @@ Alternative possibilities exist, but these scripts cannot be used as-is for that
 * Cherokee + MySQL on a single, usually virtual, machine
 * Cherokee + Eden on one machine + PostGIS on a second machine
 
-
 Additional scripts (Debian-only):
 
 * Add a Test instance to the same box as Production
@@ -43,8 +42,3 @@ Additional scripts (Debian-only):
 
 * Add a Demo instance to the same box as Production/Test
     add_demo_site.sh
-
-* Upgrade Web2Py from 2.14.6 to 2.16.1
-    upgrade_web2py.sh
-    fieldnames.py
-

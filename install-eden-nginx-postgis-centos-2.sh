@@ -35,28 +35,9 @@ adduser --system web2py
 cd /home
 env GIT_SSL_NO_VERIFY=true git clone --recursive https://github.com/web2py/web2py.git
 cd web2py
-# 2.16.1
-#git reset --hard 7035398
-# 2.17.1
-#git reset --hard 285013a
-# 2.18.3
-# git reset --hard 6128d03
-# 2.18.5
-git reset --hard 59700b8
+# 2.20.4
+git reset --hard 777c305
 git submodule update --init --recursive
-
-## Patch web2py/PyDAL/YATL
-# Fix for 2.18.3
-#sed -i "s|from urllib import FancyURLopener, urlencode, urlopen|from urllib import FancyURLopener, urlencode|" /home/web2py/gluon/packages/dal/pydal/_compat.py
-#sed -i "/urllib_quote_plus/ a \ \ \ \ from urllib2 import urlopen" /home/web2py/gluon/packages/dal/pydal/_compat.py
-
-# Fixes for 2.18.5
-cd gluon
-wget http://eden.sahanafoundation.org/downloads/scheduler.diff
-patch -p0 < scheduler.diff
-cd ..
-sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" /home/web2py/gluon/packages/dal/pydal/validators.py
-sed -i "s|\['password'\]|['passwd']|" /home/web2py/gluon/packages/dal/pydal/adapters/mysql.py
 
 ln -s /home/web2py ~
 cp -f /home/web2py/handlers/wsgihandler.py /home/web2py
@@ -241,7 +222,7 @@ stop() {
 }
 
 reload() {
-    echo -n $"Reloading \$prog" 
+    echo -n $"Reloading \$prog"
     killproc -p \$pid \$prog -HUP
     RETVAL=$?
     echo
@@ -265,11 +246,11 @@ case \$1 in
 	stop
     start
     ;;
-  status)  
+  status)
     rh_status
     RETVAL=$?
     ;;
-  *)  
+  *)
         echo $"Usage: \$prog {start|stop|restart|reload|status}"
         RETVAL=2
 esac
