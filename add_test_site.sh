@@ -11,26 +11,9 @@ ln -sf /home/prod ~
 cd /home
 git clone --recursive git://github.com/web2py/web2py.git test
 cd test
-# 2.14.6
-#git reset --hard cda35fd
-# 2.16.1
-#git reset --hard 7035398
-# 2.17.1
-#git reset --hard 285013a
-# 2.18.3
-# git reset --hard 6128d03
-# 2.18.5
-git reset --hard 59700b8
+# 2.20.4
+git reset --hard 777c305
 git submodule update --init --recursive
-
-## Patch web2py/PyDAL/YATL
-# Fix for 2.18.3
-# sed -i "s|from urllib import FancyURLopener, urlencode, urlopen|from urllib import FancyURLopener, urlencode|" $WEB2PY_HOME/gluon/packages/dal/pydal/_compat.py
-# sed -i "/urllib_quote_plus/ a \ \ \ \ from urllib2 import urlopen" $WEB2PY_HOME/gluon/packages/dal/pydal/_compat.py
-
-# Fix for 2.18.5
-sed -i "s|if getattr(func, 'validate', None) is Validator.validate:|if getattr(func, 'validate', None) is not Validator.validate:|" /home/test/gluon/packages/dal/pydal/validators.py
-sed -i "s|['password']|['passwd']|" /home/test/gluon/packages/dal/pydal/adapters/mysql.py
 
 ln -s /home/test ~
 cp -f /home/test/handlers/wsgihandler.py /home/test
