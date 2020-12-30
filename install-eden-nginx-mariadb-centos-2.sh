@@ -36,7 +36,7 @@ cd /home
 env GIT_SSL_NO_VERIFY=true git clone --recursive https://github.com/web2py/web2py.git
 cd web2py
 # 2.20.4
-git reset --hard 777c305
+git reset --hard 6da8479
 git submodule update --init --recursive
 
 ln -s /home/web2py ~
