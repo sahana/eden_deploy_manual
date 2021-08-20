@@ -10,12 +10,16 @@ read -d . DEBIAN < /etc/debian_version
 
 if [ $DEBIAN == '10' ]; then
     DEBIAN_NAME='buster'
+    PYVERSION='3'
 elif [ $DEBIAN == '9' ]; then
     DEBIAN_NAME='stretch'
+    PYVERSION='2'
 elif [ $DEBIAN == '8' ]; then
     DEBIAN_NAME='jessie'
+    PYVERSION='2'
 else
     DEBIAN_NAME='wheezy'
+    PYVERSION='2'
 fi
 
 # Update system
@@ -619,8 +623,25 @@ wget --no-check-certificate https://www.postgresql.org/media/keys/ACCC4CF8.asc
 apt-key add ACCC4CF8.asc
 apt-get update
 
-apt-get -y install postgresql-9.6 python-psycopg2 ptop pgtop
-apt-get -y install postgresql-9.6-postgis-2.3
+case $DEBIAN in
+    10)
+        apt-get -y install "postgresql-11" "pgtop"
+        apt-get -y install "postgresql-11-postgis-2.5"
+        PGHOME=/etc/postgresql/11
+        ;;
+    *)
+        # Psycopg2 versions in stretch/jessie can have problems with PG10+
+        apt-get -y install "postgresql-9.6" "ptop" "pgtop"
+        apt-get -y install "postgresql-9.6-postgis-2.3"
+        PGHOME=/etc/postgresql/9.6
+        ;;
+esac
+
+if [ $PYVERSION == '2' ]; then
+    apt-get -y install "python-psycopg2"
+else
+    apt-get -y install "python3-psycopg2"
+fi
 
 # Tune PostgreSQL
 cat << EOF >> "/etc/sysctl.conf"
