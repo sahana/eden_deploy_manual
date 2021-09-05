@@ -8,18 +8,22 @@ read -d . DEBIAN < /etc/debian_version
 
 if [ $DEBIAN == '10' ]; then
     DEBIAN_NAME='buster'
+    PYVERSION='3'
     # Apache 2.4
     extension='.conf'
 elif [ $DEBIAN == '9' ]; then
     DEBIAN_NAME='stretch'
+    PYVERSION='2'
     # Apache 2.4
     extension='.conf'
 elif [ $DEBIAN == '8' ]; then
     DEBIAN_NAME='jessie'
+    PYVERSION='2'
     # Apache 2.4
     extension='.conf'
 else
     DEBIAN_NAME='wheezy'
+    PYVERSION='2'
     # Apache 2.2
     extension=''
 fi
@@ -47,7 +51,7 @@ apt-get -y install exim4-config exim4-daemon-light
 # MySQL
 ########
 if [ $DEBIAN == '10' ]; then
-    apt-get -y install mysql-server python-mysqldb phpmyadmin mariadb-client
+    apt-get -y install mariadb-server python-mysqldb phpmyadmin mariadb-client
 elif [ $DEBIAN == '9' ]; then
     apt-get -y install mysql-server python-mysqldb phpmyadmin mariadb-client
 else
@@ -109,26 +113,34 @@ else
 fi
 
 # Install Python
-#apt-get -y install python2.6
-apt-get -y install python-dev
-# 100 Mb of diskspace due to deps, so only if you want an advanced shell
-#apt-get -y install ipython
-#apt-get -y install python-lxml python-setuptools python-dateutil
-apt-get -y install python-serial
-#apt-get -y install python-imaging python-reportlab
-#apt-get -y install python-imaging
-#apt-get -y install python-matplotlib
-apt-get -y install python-pip
-#apt-get -y install python-requests
-#apt-get -y install python-xlwt
+if [ $PYVERSION == '2' ]; then
+    apt-get -y install "python-dev" "python-pip" "python-setuptools"
+    PIP=pip
+    #apt-get -y install "python-lxml" "python-dateutil"
+    apt-get -y install "python-serial"
+    #apt-get -y install "python-imaging"
+    #apt-get -y install "python-matplotlib"
+    #apt-get -y install "python-requests"
+    #apt-get -y install "python-xlwt"
+else
+    apt-get -y install "python3-dev" "python3-pip" "python3-setuptools"
+    PIP=pip3
+    #apt-get -y install "python3-lxml" "python3-dateutil"
+    apt-get -y install "python3-serial"
+    #apt-get -y install "python3-pil"
+    #apt-get -y install "python3-matplotlib"
+    #apt-get -y install "python3-requests"
+    #apt-get -y install "python3-xlwt"
+fi
+apt-get clean
 
-pip install lxml
-pip install python-dateutil
-pip install pillow
-pip install requests
-pip install xlwt
+$PIP install lxml
+$PIP install python-dateutil
+$PIP install pillow
+$PIP install requests
+$PIP install xlwt
 
-pip install geopy
+$PIP install geopy
 
 # Upgrade ReportLab for Percentage support
 #apt-get remove -y python-reportlab
@@ -137,7 +149,7 @@ pip install geopy
 #cd reportlab-3.3.0
 #python setup.py install
 #cd ..
-pip install reportlab
+$PIP install reportlab
 
 # Upgrade Shapely for Simplify enhancements
 #apt-get remove -y python-shapely
@@ -147,7 +159,7 @@ apt-get -y install libgeos-dev
 #cd Shapely-1.5.17
 #python setup.py install
 #cd ..
-pip install shapely
+$PIP install shapely
 
 # Upgrade XLRD for XLS import support
 #apt-get remove -y python-xlrd
@@ -156,7 +168,7 @@ pip install shapely
 #cd xlrd-0.9.4
 #python setup.py install
 #cd ..
-pip install xlrd
+$PIP install xlrd
 
 #########
 # Web2Py
