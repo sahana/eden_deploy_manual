@@ -79,9 +79,9 @@ fi
 #########
 apt-get -y install apache2
 if [ $PYVERSION == '2' ]; then
-    libapache2-mod-wsgi
+    apt-get -y install libapache2-mod-wsgi
 else
-    libapache2-mod-wsgi-py3
+    apt-get -y install libapache2-mod-wsgi-py3
 fi
 a2enmod rewrite
 a2enmod deflate
