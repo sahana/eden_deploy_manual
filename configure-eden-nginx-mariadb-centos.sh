@@ -10,7 +10,7 @@ echo -e "What host name should we use? : \c "
 read hostname
 sitename=$hostname".$DOMAIN"
 
-echo -e "What template should we use? : \c "
+echo -e "What template should we use? [default] : \c "
 read template
 if [[ ! "$template" ]]; then
     template="default"
