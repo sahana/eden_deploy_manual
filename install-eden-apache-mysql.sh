@@ -51,7 +51,9 @@ apt-get -y install exim4-config exim4-daemon-light
 # MySQL
 ########
 if [ $DEBIAN == '10' ]; then
-    apt-get -y install mariadb-server python-mysqldb phpmyadmin mariadb-client
+    apt-get -y install mariadb-server mariadb-client
+    # Not working as have held broken packages:
+    apt-get -y install phpmyadmin
 elif [ $DEBIAN == '9' ]; then
     apt-get -y install mysql-server python-mysqldb phpmyadmin mariadb-client
 else
@@ -114,7 +116,7 @@ fi
 
 # Install Python
 if [ $PYVERSION == '2' ]; then
-    apt-get -y install "python-dev" "python-pip" "python-setuptools"
+    apt-get -y install "python-dev" "python-pip" "python-setuptools" "python-mysqldb"
     PIP=pip
     #apt-get -y install "python-lxml" "python-dateutil"
     apt-get -y install "python-serial"
@@ -123,7 +125,7 @@ if [ $PYVERSION == '2' ]; then
     #apt-get -y install "python-requests"
     #apt-get -y install "python-xlwt"
 else
-    apt-get -y install "python3-dev" "python3-pip" "python3-setuptools"
+    apt-get -y install "python3-dev" "python3-pip" "python3-setuptools" "python3-mysqldb"
     PIP=pip3
     #apt-get -y install "python3-lxml" "python3-dateutil"
     apt-get -y install "python3-serial"
