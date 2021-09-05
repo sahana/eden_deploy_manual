@@ -131,6 +131,8 @@ else
     #apt-get -y install "python3-matplotlib"
     #apt-get -y install "python3-requests"
     #apt-get -y install "python3-xlwt"
+    update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 2
 fi
 apt-get clean
 
@@ -201,17 +203,16 @@ routes_onerror = [
 EOF
 
 # Configure Matplotlib
-mkdir /home/web2py/.matplotlib
-chown web2py /home/web2py/.matplotlib
-echo "os.environ['MPLCONFIGDIR'] = '/home/web2py/.matplotlib'" >> /home/web2py/wsgihandler.py
-sed -i 's|TkAgg|Agg|' /etc/matplotlibrc
+#mkdir /home/web2py/.matplotlib
+#chown web2py /home/web2py/.matplotlib
+#echo "os.environ['MPLCONFIGDIR'] = '/home/web2py/.matplotlib'" >> /home/web2py/wsgihandler.py
+#sed -i 's|TkAgg|Agg|' /etc/matplotlibrc
 
 ##############
 # Sahana Eden
 ##############
 # Install Sahana Eden
-cd web2py
-cd applications
+cd ~web2py/applications
 # @ToDo: Stable branch
 git clone git://github.com/sahana/eden-stable.git eden
 # Fix permissions
