@@ -75,7 +75,7 @@ fi
 #########
 # Apache
 #########
-apt-get -y install libapache2-mod-wsgi
+apt-get -y install apache2 libapache2-mod-wsgi
 a2enmod rewrite
 a2enmod deflate
 a2enmod headers
