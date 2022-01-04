@@ -1,12 +1,17 @@
 #!/bin/bash
 
-# Script to turn a generic Debian Wheezy, Jessie, Stretch or Buster box into an Eden server
+# Script to turn a generic Debian Wheezy, Jessie, Stretch, Buster or Bullseye box into an Eden server
 # with Apache & MySQL
 
 # Which OS are we running?
 read -d . DEBIAN < /etc/debian_version
 
 if [ $DEBIAN == '10' ]; then
+    DEBIAN_NAME='bullseye'
+    PYVERSION='3'
+    # Apache 2.4
+    extension='.conf'
+elif [ $DEBIAN == '10' ]; then
     DEBIAN_NAME='buster'
     PYVERSION='3'
     # Apache 2.4
@@ -34,7 +39,9 @@ apt-get upgrade -y
 
 # Install Admin Tools
 apt-get install -y "at" "curl" "dos2unix" "htop" "lrzsz" "mlocate" "p7zip" "psmisc" "pwgen" "rcconf" "sudo" "telnet" "unzip" "vim"
-if [ $DEBIAN == '10' ]; then
+if [ $DEBIAN == '11' ]; then
+    echo 'elinks-lite not available in Debian 11'
+elif [ $DEBIAN == '10' ]; then
     echo 'elinks-lite not available in Debian 10'
 elif [ $DEBIAN == '9' ]; then
     echo 'elinks-lite not available in Debian 9'
@@ -50,7 +57,10 @@ apt-get -y install exim4-config exim4-daemon-light
 ########
 # MySQL
 ########
-if [ $DEBIAN == '10' ]; then
+if [ $DEBIAN == '11' ]; then
+    apt-get -y install mariadb-server mariadb-client
+    apt-get -y install phpmyadmin
+elif [ $DEBIAN == '10' ]; then
     apt-get -y install mariadb-server mariadb-client
     # Not working as have held broken packages:
     apt-get -y install phpmyadmin
@@ -62,7 +72,9 @@ else
 fi
 
 # Tune for smaller RAM setups
-if [ $DEBIAN == '10' ]; then
+if [ $DEBIAN == '11' ]; then
+    echo 'MariaDB tuning needs configuring in Debian 11'
+elif [ $DEBIAN == '10' ]; then
     echo 'MariaDB tuning needs configuring in Debian 10'
 elif [ $DEBIAN == '9' ]; then
     echo 'MariaDB tuning needs configuring in Debian 9'
@@ -110,7 +122,9 @@ EOF
 # Python
 #########
 # Install Libraries
-if [ $DEBIAN == '10' ]; then
+if [ $DEBIAN == '11' ]; then
+    apt-get -y install libgeos-c1v5
+elif [ $DEBIAN == '10' ]; then
     apt-get -y install libgeos-c1v5
 elif [ $DEBIAN == '9' ]; then
     apt-get -y install libgeos-c1v5

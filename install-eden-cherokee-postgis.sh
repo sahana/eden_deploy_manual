@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to turn a generic Debian Wheezy or Jessie box into an Eden server
+# Script to turn a generic Debian Wheezy, Jessie, Stretch, Buster or Bullseye box into an Eden server
 # with Cherokee & PostgreSQL
 # - tunes PostgreSQL for 512Mb RAM (e.g. Amazon Micro (free tier))
 # - run pg1024 to tune for 1Gb RAM (e.g. Amazon Small or greater)
@@ -8,7 +8,10 @@
 # Which OS are we running?
 read -d . DEBIAN < /etc/debian_version
 
-if [ $DEBIAN == '10' ]; then
+if [ $DEBIAN == '11' ]; then
+    DEBIAN_NAME='bullseye'
+    PYVERSION='3'
+elif [ $DEBIAN == '10' ]; then
     DEBIAN_NAME='buster'
     PYVERSION='3'
 elif [ $DEBIAN == '9' ]; then
@@ -29,7 +32,9 @@ apt-get clean
 
 # Install Admin Tools
 apt-get -y install "at" "curl" "dos2unix" "htop" "lrzsz" "mlocate" "p7zip" "psmisc" "pwgen" "rcconf" "sudo" "telnet" "unzip" "vim"
-if [ $DEBIAN == '10' ]; then
+if [ $DEBIAN == '11' ]; then
+    apt-get -y install elinks net-tools
+elif [ $DEBIAN == '10' ]; then
     apt-get -y install elinks net-tools
 elif [ $DEBIAN == '9' ]; then
     apt-get -y install elinks net-tools
@@ -48,7 +53,9 @@ apt-get clean
 # Python
 #########
 # Install Libraries
-if [ $DEBIAN == '10' ]; then
+if [ $DEBIAN == '11' ]; then
+    apt-get -y install libgeos-c1v5
+elif [ $DEBIAN == '10' ]; then
     apt-get -y install libgeos-c1v5
 elif [ $DEBIAN == '9' ]; then
     apt-get -y install libgeos-c1v5
@@ -57,24 +64,43 @@ else
 fi
 
 # Install Python
-#apt-get -y install python2.7
-apt-get -y install python-dev
-# 100 Mb of diskspace due to deps, so only if you want an advanced shell
-#apt-get -y install ipython
-apt-get clean
-apt-get -y install python-lxml python-setuptools python-dateutil
-apt-get clean
-apt-get -y install python-serial
-#apt-get -y install python-imaging python-reportlab
-apt-get -y install python-imaging
-apt-get -y install python-matplotlib
-apt-get -y install python-pip
-apt-get -y install python-requests
-apt-get -y install python-xlwt
+if [ $PYVERSION == '2' ]; then
+    PIP=pip
+    #apt-get -y install python2.7
+    apt-get -y install python-dev python-pip python-setuptools
+    # 100 Mb of diskspace due to deps, so only if you want an advanced shell
+    #apt-get -y install ipython
+    apt-get clean
+    #apt-get -y install python-lxml python-dateutil
+    apt-get clean
+    apt-get -y install python-serial
+    #apt-get -y install python-imaging python-reportlab
+    #apt-get -y install python-imaging
+    #apt-get -y install python-matplotlib
+    #apt-get -y install python-requests
+    #apt-get -y install python-xlwt
+else
+    PIP=pip3
+    apt-get -y install "python3-dev" "python3-pip" "python3-setuptools" "python3-mysqldb"
+    #apt-get -y install "python3-lxml" "python3-dateutil"
+    apt-get -y install "python3-serial"
+    #apt-get -y install "python3-pil"
+    #apt-get -y install "python3-matplotlib"
+    #apt-get -y install "python3-requests"
+    #apt-get -y install "python3-xlwt"
+    update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+fi
 apt-get -y install build-essential
 apt-get clean
 
-pip install geopy
+$PIP install lxml
+$PIP install python-dateutil
+$PIP install pillow
+$PIP install requests
+$PIP install xlwt
+
+$PIP install geopy
 
 # Upgrade ReportLab for Percentage support
 #apt-get remove -y python-reportlab
@@ -83,7 +109,7 @@ pip install geopy
 #cd reportlab-3.3.0
 #python setup.py install
 #cd ..
-pip install reportlab
+$PIP install reportlab
 
 # Upgrade Shapely for Simplify enhancements
 #apt-get remove -y python-shapely
@@ -93,7 +119,7 @@ apt-get -y install libgeos-dev
 #cd Shapely-1.5.17
 #python setup.py install
 #cd ..
-pip install shapely
+$PIP install shapely
 
 # Upgrade XLRD for XLS import support
 #apt-get remove -y python-xlrd
@@ -102,7 +128,7 @@ pip install shapely
 #cd xlrd-0.9.4
 #python setup.py install
 #cd ..
-pip install xlrd
+$PIP install xlrd
 
 #########
 # Web2Py
@@ -195,7 +221,9 @@ cd /tmp
 wget https://github.com/cherokee/webserver/archive/master.zip
 unzip master.zip
 cd webserver-master
-if [ $DEBIAN == '10' ]; then
+if [ $DEBIAN == '11' ]; then
+    apt-get install -y libtool-bin
+elif [ $DEBIAN == '10' ]; then
     apt-get install -y libtool-bin
 elif [ $DEBIAN == '9' ]; then
     apt-get install -y libtool-bin

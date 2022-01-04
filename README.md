@@ -6,15 +6,15 @@ http://eden.sahanafoundation.org/wiki/InstallationGuidelines/Linux/Server
 These scripts can be used to deploy Eden on a single, usually virtual, machine.
 
 There are 5 alternative stacks supported by these scripts:
-* nginx + PostGIS (on Debian Linux versions 8, 9 or 10) - recommended
+* nginx + PostGIS (on Debian Linux versions 8, 9, 10 or 11) - recommended
     install-eden-nginx-postgis.sh
     configure-eden-nginx-postgis.sh
 
-* Cherokee + PostGIS (on Debian Linux versions 7, 8, 9 or 10)
+* Cherokee + PostGIS (on Debian Linux versions 7, 8, 9, 10 or 11)
     install-eden-cherokee-postgis.sh
     configure-eden-cherokee-postgis.sh
 
-* Apache + MySQL (on Debian Linux versions 7, 8, 9 or 10)
+* Apache + MySQL (on Debian Linux versions 7, 8, 9, 10 or 11)
     install-eden-apache-mysql.sh
     configure-eden-apache-mysql.sh
 

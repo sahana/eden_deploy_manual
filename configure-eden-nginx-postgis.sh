@@ -9,7 +9,7 @@
 read -d . DEBIAN < /etc/debian_version
 
 case $DEBIAN in
-    10)
+    11 | 10)
         PYVERSION='3'
         ;;
     9 | 8)
@@ -93,7 +93,7 @@ dpkg-reconfigure "exim4-config"
 # Install and run certbot
 #
 case $DEBIAN in
-    10)
+    11 | 10)
         apt-get -y install "certbot" "python3-certbot-nginx"
         ;;
     9)

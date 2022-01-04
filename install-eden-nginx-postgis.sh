@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to turn a generic Debian 8, 9 or 10 box into an Eden server
+# Script to turn a generic Debian 8, 9, 10 or 11 box into an Eden server
 # - with Nginx & PostgreSQL
 # - tunes PostgreSQL for 1Gb RAM (e.g. Amazon Small or greater)
 # - run pg512 to tune for 512Mb RAM (e.g. Amazon Micro (free tier))
@@ -11,6 +11,10 @@
 read -d . DEBIAN < /etc/debian_version
 
 case $DEBIAN in
+    11)
+        DEBIAN_NAME='bullseye'
+        PYVERSION='3'
+        ;;
     10)
         DEBIAN_NAME='buster'
         PYVERSION='3'
@@ -55,7 +59,7 @@ apt-get clean
 #
 apt-get -y install "at" "curl" "dos2unix" "htop" "lrzsz" "mlocate" "p7zip" "psmisc" "pwgen" "rcconf" "sudo" "telnet" "unzip" "vim"
 case $DEBIAN in
-    10 | 9)
+    11 | 10 | 9)
         apt-get -y install "elinks" "net-tools"
         ;;
     *)
@@ -82,14 +86,14 @@ apt-get clean
 
 ## C Libraries
 case $DEBIAN in
-    10 | 9)
+    11 | 10 | 9)
         apt-get -y install "libgeos-c1v5"
         ;;
     *)
         apt-get -y install "libgeos-c1"
         ;;
 esac
-apt-get install "libgeos-dev" "libodbc1"
+apt-get -y install "libgeos-dev" "libodbc1"
 apt-get clean
 
 ## Python Libraries
@@ -134,8 +138,8 @@ $PIP install xlrd
 # TODO catch existing installation
 
 ## Set up web2py user+group
-adduser --system --disabled-password web2py
-addgroup web2py
+/sbin/adduser --system --disabled-password web2py
+/sbin/addgroup web2py
 
 ## Clone web2py from trunk
 cd /home
@@ -276,7 +280,11 @@ cd /tmp
 wget https://projects.unbit.it/downloads/uwsgi-2.0.18.tar.gz
 tar zxvf uwsgi-2.0.18.tar.gz
 cd uwsgi-2.0.18
-python uwsgiconfig.py --build pyonly
+if [ $PYVERSION == '2' ]; then
+    python uwsgiconfig.py --build pyonly
+else
+    python3 uwsgiconfig.py --build pyonly
+fi
 cp uwsgi /usr/local/bin
 
 # =============================================================================
@@ -375,6 +383,11 @@ apt-key add ACCC4CF8.asc
 apt-get update
 
 case $DEBIAN in
+    11)
+        apt-get -y install "postgresql-13" "pgtop"
+        apt-get -y install "postgresql-13-postgis-3"
+        PGHOME=/etc/postgresql/13
+        ;;
     10)
         apt-get -y install "postgresql-11" "pgtop"
         apt-get -y install "postgresql-11-postgis-2.5"
