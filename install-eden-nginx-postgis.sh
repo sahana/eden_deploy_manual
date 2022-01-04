@@ -334,8 +334,13 @@ chown web2py:www-data /var/log/uwsgi
 # TODO Proper LSB tags
 cat << EOF > "/etc/init.d/uwsgi-prod"
 #! /bin/bash
-# /etc/init.d/uwsgi-prod
-#
+### BEGIN INIT INFO
+# Provides:          uwsgi
+# Required-Start:    $local_fs $remote_fs $network
+# Required-Stop:     $local_fs $remote_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+### END INIT INFO
 
 daemon=/usr/local/bin/uwsgi
 pid=/var/run/uwsgi-prod.pid
