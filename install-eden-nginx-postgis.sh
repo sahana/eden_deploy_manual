@@ -115,6 +115,8 @@ else
     #apt-get -y install "python3-matplotlib"
     #apt-get -y install "python3-requests"
     #apt-get -y install "python3-xlwt"
+    update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 2
 fi
 apt-get clean
 
